@@ -1,0 +1,97 @@
+<mxfile host="app.diagrams.net" modified="2026-09-01T08:00:00.000Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="DigitalLogBookERD" name="Database ERD Schema">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ROLES -->
+        <mxCell id="tbl_roles" value="&lt;b&gt;ROLES&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ name: VARCHAR(50) [UQ]&lt;br&gt;+ description: TEXT&lt;br&gt;+ created_at: TIMESTAMPTZ&lt;br&gt;+ updated_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#dbeafe;strokeColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="220" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- DEPARTMENTS -->
+        <mxCell id="tbl_dept" value="&lt;b&gt;DEPARTMENTS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ code: VARCHAR(20) [UQ]&lt;br&gt;+ name: VARCHAR(100)&lt;br&gt;+ description: TEXT&lt;br&gt;+ is_active: BOOLEAN&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#dbeafe;strokeColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="60" y="270" width="220" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- POSITIONS -->
+        <mxCell id="tbl_pos" value="&lt;b&gt;POSITIONS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ department_id: UUID [FK]&lt;br&gt;+ name: VARCHAR(100)&lt;br&gt;+ level: INTEGER&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#dbeafe;strokeColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="60" y="480" width="220" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- USERS -->
+        <mxCell id="tbl_users" value="&lt;b&gt;USERS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ role_id: UUID [FK]&lt;br&gt;+ department_id: UUID [FK]&lt;br&gt;+ position_id: UUID [FK]&lt;br&gt;+ supervisor_id: UUID [FK]&lt;br&gt;+ name: VARCHAR(150)&lt;br&gt;+ email: VARCHAR(255) [UQ]&lt;br&gt;+ password_hash: TEXT&lt;br&gt;+ is_active: BOOLEAN&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#e0e7ff;strokeColor=#4f46e5;" vertex="1" parent="1">
+          <mxGeometry x="380" y="180" width="240" height="230" as="geometry" />
+        </mxCell>
+
+        <!-- ACTIVITY_CATEGORIES -->
+        <mxCell id="tbl_cat" value="&lt;b&gt;ACTIVITY_CATEGORIES&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ name: VARCHAR(100) [UQ]&lt;br&gt;+ description: TEXT&lt;br&gt;+ color_hex: VARCHAR(10)&lt;br&gt;+ is_active: BOOLEAN" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#dcfce7;strokeColor=#16a34a;" vertex="1" parent="1">
+          <mxGeometry x="380" y="480" width="240" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- LOCATIONS -->
+        <mxCell id="tbl_loc" value="&lt;b&gt;LOCATIONS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ name: VARCHAR(100) [UQ]&lt;br&gt;+ address: TEXT&lt;br&gt;+ is_active: BOOLEAN" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#dcfce7;strokeColor=#16a34a;" vertex="1" parent="1">
+          <mxGeometry x="380" y="650" width="240" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- LOG_BOOKS -->
+        <mxCell id="tbl_lb" value="&lt;b&gt;LOG_BOOKS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ user_id: UUID [FK]&lt;br&gt;+ category_id: UUID [FK]&lt;br&gt;+ location_id: UUID [FK]&lt;br&gt;+ activity_date: DATE&lt;br&gt;+ start_time: TIME&lt;br&gt;+ end_time: TIME&lt;br&gt;+ title: VARCHAR(255)&lt;br&gt;+ description: TEXT&lt;br&gt;+ output_result: TEXT&lt;br&gt;+ obstacles: TEXT&lt;br&gt;+ follow_up: TEXT&lt;br&gt;+ status: VARCHAR(30)&lt;br&gt;+ submitted_at: TIMESTAMPTZ&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#fef3c7;strokeColor=#d97706;" vertex="1" parent="1">
+          <mxGeometry x="720" y="160" width="260" height="310" as="geometry" />
+        </mxCell>
+
+        <!-- LOG_BOOK_ATTACHMENTS -->
+        <mxCell id="tbl_att" value="&lt;b&gt;LOG_BOOK_ATTACHMENTS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ log_book_id: UUID [FK]&lt;br&gt;+ file_name: VARCHAR(255)&lt;br&gt;+ file_path: TEXT&lt;br&gt;+ file_size: INTEGER&lt;br&gt;+ file_type: VARCHAR(100)&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#fef3c7;strokeColor=#d97706;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="120" width="250" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- LOG_BOOK_REVIEWS -->
+        <mxCell id="tbl_rev" value="&lt;b&gt;LOG_BOOK_REVIEWS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ log_book_id: UUID [FK]&lt;br&gt;+ reviewer_id: UUID [FK]&lt;br&gt;+ action: VARCHAR(30)&lt;br&gt;+ review_notes: TEXT&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#fee2e2;strokeColor=#dc2626;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="320" width="250" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- NOTIFICATIONS -->
+        <mxCell id="tbl_notif" value="&lt;b&gt;NOTIFICATIONS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ user_id: UUID [FK]&lt;br&gt;+ title: VARCHAR(255)&lt;br&gt;+ message: TEXT&lt;br&gt;+ type: VARCHAR(50)&lt;br&gt;+ reference_id: VARCHAR(100)&lt;br&gt;+ is_read: BOOLEAN&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#f3e8ff;strokeColor=#9333ea;" vertex="1" parent="1">
+          <mxGeometry x="720" y="520" width="260" height="170" as="geometry" />
+        </mxCell>
+
+        <!-- AUDIT_LOGS -->
+        <mxCell id="tbl_audit" value="&lt;b&gt;AUDIT_LOGS&lt;/b&gt;&lt;hr&gt;+ id: UUID [PK]&lt;br&gt;+ user_id: UUID [FK]&lt;br&gt;+ action: VARCHAR(50)&lt;br&gt;+ module: VARCHAR(50)&lt;br&gt;+ record_id: VARCHAR(100)&lt;br&gt;+ old_values: JSONB&lt;br&gt;+ new_values: JSONB&lt;br&gt;+ ip_address: VARCHAR(45)&lt;br&gt;+ user_agent: TEXT&lt;br&gt;+ created_at: TIMESTAMPTZ" style="shape=swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=11;fillColor=#f1f5f9;strokeColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="520" width="250" height="210" as="geometry" />
+        </mxCell>
+
+        <!-- RELATION CONNECTORS -->
+        <mxCell id="rel_role_user" edge="1" parent="1" source="tbl_roles" target="tbl_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_dept_user" edge="1" parent="1" source="tbl_dept" target="tbl_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_pos_user" edge="1" parent="1" source="tbl_pos" target="tbl_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_user_lb" edge="1" parent="1" source="tbl_users" target="tbl_lb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_cat_lb" edge="1" parent="1" source="tbl_cat" target="tbl_lb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_loc_lb" edge="1" parent="1" source="tbl_loc" target="tbl_lb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_lb_att" edge="1" parent="1" source="tbl_lb" target="tbl_att">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_lb_rev" edge="1" parent="1" source="tbl_lb" target="tbl_rev">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_user_notif" edge="1" parent="1" source="tbl_users" target="tbl_notif">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_user_audit" edge="1" parent="1" source="tbl_users" target="tbl_audit">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
