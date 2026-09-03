@@ -39,7 +39,7 @@ export interface LogBookModel {
   description: string;
   outputResult: string;
   notes?: string | null;
-  status: "COMPLETED" | "IN_PROGRESS" | "DRAFT";
+  status: "COMPLETED" | "IN_PROGRESS" | "DRAFT" | "SICK" | "PERMISSION" | "HOLIDAY";
   createdAt: string;
   updatedAt: string;
 }

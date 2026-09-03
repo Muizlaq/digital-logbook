@@ -18,6 +18,9 @@ import {
   FileCheck,
   CalendarDays,
   Target,
+  HeartPulse,
+  UserCheck,
+  Palmtree,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -115,6 +118,10 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
 
       let totalMinutes = 0;
       dayLogs.forEach((lb) => {
+        // Sick, Permission, Holiday count as 0 working minutes
+        if (lb.status === "SICK" || lb.status === "PERMISSION" || lb.status === "HOLIDAY") {
+          return;
+        }
         try {
           const [h1, m1] = lb.startTime.split(":").map(Number);
           const [h2, m2] = lb.endTime.split(":").map(Number);
@@ -128,6 +135,10 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
       const hours = (totalMinutes / 60).toFixed(1);
       const isWeekend = idx >= 5;
 
+      const hasSick = dayLogs.some((l) => l.status === "SICK");
+      const hasPermission = dayLogs.some((l) => l.status === "PERMISSION");
+      const hasHoliday = dayLogs.some((l) => l.status === "HOLIDAY");
+
       return {
         ...item,
         dateStr,
@@ -137,6 +148,9 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
         hours: parseFloat(hours),
         isWeekend,
         hasActivity: dayLogs.length > 0,
+        hasSick,
+        hasPermission,
+        hasHoliday,
       };
     });
   }, [weekDates, weekLogbooks]);
@@ -148,12 +162,18 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
   const weeklyTarget = dailyTarget * 5; // 5 working days
   const weeklyProgressPercent = Math.round((parseFloat(totalWeeklyHours) / weeklyTarget) * 100);
 
-  const activeDaysCount = daysBreakdown.filter((d) => !d.isWeekend && d.hasActivity).length;
-  const avgHoursPerActiveDay = activeDaysCount > 0 ? (parseFloat(totalWeeklyHours) / activeDaysCount).toFixed(1) : "0.0";
+  // Presence counters
+  const presentDaysCount = daysBreakdown.filter((d) => !d.isWeekend && d.hasActivity && !d.hasSick && !d.hasPermission && !d.hasHoliday).length;
+  const sickDaysCount = daysBreakdown.filter((d) => d.hasSick).length;
+  const permissionDaysCount = daysBreakdown.filter((d) => d.hasPermission).length;
+  const holidayDaysCount = daysBreakdown.filter((d) => d.hasHoliday).length;
+
+  const avgHoursPerActiveDay = presentDaysCount > 0 ? (parseFloat(totalWeeklyHours) / presentDaysCount).toFixed(1) : "0.0";
 
   // Category breakdown
   const categoryMinutesMap: { [catId: string]: number } = {};
   weekLogbooks.forEach((lb) => {
+    if (lb.status === "SICK" || lb.status === "PERMISSION" || lb.status === "HOLIDAY") return;
     try {
       const [h1, m1] = lb.startTime.split(":").map(Number);
       const [h2, m2] = lb.endTime.split(":").map(Number);
@@ -176,7 +196,7 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
     }
   });
   const topCategory = categories.find((c) => c.id === topCatId);
-  const topCategoryName = topCategory ? topCategory.name : "Umum / Beragam";
+  const topCategoryName = topCategory ? topCategory.name : "Software & Teknis";
 
   // EXPORT WEEKLY RESUME PDF (Day 1 s/d Day 5 Structured Format)
   const exportWeeklyPDF = () => {
@@ -203,13 +223,13 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
     doc.text(`Nama: ${profileName} (${jobTitle})`, 14, 31);
     doc.text(`Periode Pekan: ${weekLabel}`, 14, 36);
     doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString("id-ID")}`, 140, 31);
-    doc.text(`Total Waktu: ${totalWeeklyHours} Jam (Target: ${weeklyTarget} Jam)`, 140, 36);
+    doc.text(`Presensi: Hadir ${presentDaysCount}h | Sakit ${sickDaysCount}h | Izin ${permissionDaysCount}h`, 140, 36);
 
     doc.setDrawColor(226, 232, 240);
     doc.line(14, 40, 196, 40);
 
     // 3. Day 1 - Day 5 Detailed Table
-    const tableColumn = ["Hari / Tanggal", "Jam Kerja", "Kategori", "Aktivitas & Hasil Capaian Output", "Status"];
+    const tableColumn = ["Hari / Tanggal", "Jam Kerja", "Kategori", "Aktivitas & Keterangan Output", "Status Presensi"];
     const tableRows: any[] = [];
 
     daysBreakdown.slice(0, 5).forEach((d) => {
@@ -218,18 +238,26 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
           `${d.label}\n${d.formattedDate}`,
           "0 Jam",
           "-",
-          "Tidak ada aktivitas kerja yang dicatat pada hari ini.",
+          "Tidak ada catatan aktivitas kerja pada hari ini.",
           "Libur / Draf",
         ]);
       } else {
         d.dayLogs.forEach((lb, logIdx) => {
           const cat = categories.find((c) => c.id === lb.categoryId)?.name || "Umum";
+          let statusText = lb.status;
+          if (lb.status === "SICK") statusText = "SAKIT 🏥";
+          else if (lb.status === "PERMISSION") statusText = "IZIN / CUTI 📄";
+          else if (lb.status === "HOLIDAY") statusText = "LIBUR 🏖️";
+          else if (lb.status === "COMPLETED") statusText = "HADIR - SELESAI ✅";
+
           tableRows.push([
             logIdx === 0 ? `${d.label}\n${d.formattedDate}\n(Total: ${d.hours}j)` : "",
-            `${lb.startTime} - ${lb.endTime}\n(${calculateDuration(lb.startTime, lb.endTime)})`,
+            lb.status === "SICK" || lb.status === "PERMISSION" || lb.status === "HOLIDAY"
+              ? "0 Jam (Izin/Sakit)"
+              : `${lb.startTime} - ${lb.endTime}\n(${calculateDuration(lb.startTime, lb.endTime)})`,
             cat,
-            `• ${lb.title}\nOutput: ${lb.outputResult}${lb.notes ? `\nCatatan: ${lb.notes}` : ""}`,
-            lb.status,
+            `• ${lb.title}\n${lb.status === "SICK" ? "Keterangan Medis: " : "Output: "}${lb.outputResult || lb.description}${lb.notes ? `\nCatatan: ${lb.notes}` : ""}`,
+            statusText,
           ]);
         });
       }
@@ -244,7 +272,7 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
           logIdx === 0 ? `${d.label}\n${d.formattedDate}\n(Total: ${d.hours}j)` : "",
           `${lb.startTime} - ${lb.endTime}`,
           cat,
-          `• ${lb.title}\nOutput: ${lb.outputResult}`,
+          `• ${lb.title}\nOutput: ${lb.outputResult || lb.description}`,
           lb.status,
         ]);
       });
@@ -268,14 +296,14 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
 
       doc.setFontSize(8.5);
       doc.setTextColor(71, 85, 105);
-      doc.text(`1. Total Akumulasi Waktu Kerja 5 Hari: ${totalWeeklyHours} Jam (${weeklyProgressPercent}% dari target pekanan).`, 16, finalY + 16);
-      doc.text(`2. Rata-rata Durasi Kerja per Hari: ${avgHoursPerActiveDay} Jam / hari aktif.`, 16, finalY + 21);
-      doc.text(`3. Fokus Utama Bidang: ${topCategoryName} (${(topCatMinutes / 60).toFixed(1)} Jam).`, 16, finalY + 26);
-      doc.text(`4. Total Aktivitas Terselesaikan: ${weekLogbooks.filter((l) => l.status === "COMPLETED").length} dari ${weekLogbooks.length} aktivitas.`, 16, finalY + 31);
+      doc.text(`1. Total Akumulasi Jam Kerja Efektif: ${totalWeeklyHours} Jam (${weeklyProgressPercent}% dari target pekanan).`, 16, finalY + 16);
+      doc.text(`2. Rekapitulasi Presensi: Hadir ${presentDaysCount} Hari | Sakit ${sickDaysCount} Hari | Izin ${permissionDaysCount} Hari | Libur ${holidayDaysCount} Hari.`, 16, finalY + 21);
+      doc.text(`3. Rata-rata Jam Kerja per Hari Aktif: ${avgHoursPerActiveDay} Jam / hari hadir.`, 16, finalY + 26);
+      doc.text(`4. Fokus Utama Bidang: ${topCategoryName}.`, 16, finalY + 31);
     }
 
     doc.save(`Resume_Laporan_Mingguan_${profileName.replace(/\s+/g, "_")}_${mondayStr}_sd_${sundayStr}.pdf`);
-    toast.success("Resume Mingguan (Hari 1 s/d Hari 5) PDF berhasil diunduh.");
+    toast.success("Resume Mingguan PDF berhasil diunduh.");
   };
 
   return (
@@ -346,13 +374,13 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
         </CardContent>
       </Card>
 
-      {/* Sintesis Rekapitulasi 5 Hari (Top KPI Summary) */}
+      {/* Sintesis Rekapitulasi 5 Hari (Top KPI Summary with Attendance breakdown) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Jam 5 Hari */}
+        {/* Total Jam Kerja */}
         <Card className="border-blue-200 dark:border-blue-900/50 bg-blue-50/30 dark:bg-blue-950/20 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-400">
-              Total Waktu 5 Hari
+              Total Jam Efektif
             </CardTitle>
             <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2 text-blue-700 dark:text-blue-300">
               <Clock className="h-4 w-4" />
@@ -363,28 +391,33 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
               {totalWeeklyHours} <span className="text-xs font-semibold text-slate-400">/ {weeklyTarget} Jam</span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Rata-rata {avgHoursPerActiveDay} Jam / hari aktif ({weeklyProgressPercent}%)
+              Rata-rata {avgHoursPerActiveDay} Jam / hari hadir ({weeklyProgressPercent}%)
             </p>
           </CardContent>
         </Card>
 
-        {/* Hari Aktif Bekerja */}
+        {/* Kehadiran & Absensi */}
         <Card className="border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/30 dark:bg-emerald-950/20 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-              Hari Kerja Aktif
+              Rekap Presensi
             </CardTitle>
             <div className="rounded-lg bg-emerald-100 dark:bg-emerald-900/50 p-2 text-emerald-700 dark:text-emerald-300">
-              <CheckCircle2 className="h-4 w-4" />
+              <UserCheck className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-200">
-              {activeDaysCount} <span className="text-xs font-semibold text-slate-400">/ 5 Hari</span>
+              {presentDaysCount} <span className="text-xs font-semibold text-slate-400">Hadir</span>
             </div>
-            <p className="text-xs text-emerald-700/80 dark:text-emerald-400 mt-1">
-              {weekLogbooks.length} total entri aktivitas tercatat
-            </p>
+            <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+              {sickDaysCount > 0 && <span className="text-rose-600 font-bold">🏥 {sickDaysCount} Sakit</span>}
+              {permissionDaysCount > 0 && <span className="text-amber-600 font-bold">📄 {permissionDaysCount} Izin</span>}
+              {holidayDaysCount > 0 && <span className="text-purple-600 font-bold">🏖️ {holidayDaysCount} Libur</span>}
+              {sickDaysCount === 0 && permissionDaysCount === 0 && holidayDaysCount === 0 && (
+                <span>Kehadiran 100% penuh</span>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -408,11 +441,11 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
           </CardContent>
         </Card>
 
-        {/* Capaian Selesai */}
+        {/* Aktivitas Tuntas */}
         <Card className="border-amber-200 dark:border-amber-900/50 bg-amber-50/30 dark:bg-amber-950/20 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              Capaian Selesai
+              Aktivitas Selesai
             </CardTitle>
             <div className="rounded-lg bg-amber-100 dark:bg-amber-900/50 p-2 text-amber-700 dark:text-amber-300">
               <FileCheck className="h-4 w-4 text-amber-500" />
@@ -423,7 +456,7 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
               {weekLogbooks.filter((l) => l.status === "COMPLETED").length} <span className="text-xs font-semibold text-slate-400">/ {weekLogbooks.length}</span>
             </div>
             <p className="text-xs text-amber-700/80 dark:text-amber-400 mt-1">
-              Aktivitas berstatus tuntas
+              Pekerjaan berstatus selesai
             </p>
           </CardContent>
         </Card>
@@ -437,110 +470,155 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
             Rangkuman Alur Kerja Harian (Hari 1 s/d Hari 5)
           </h3>
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            Total {daysBreakdown.slice(0, 5).filter((d) => d.hasActivity).length} hari aktif bekerja
+            {presentDaysCount} hari hadir {sickDaysCount > 0 ? `• ${sickDaysCount} hari sakit` : ""} {permissionDaysCount > 0 ? `• ${permissionDaysCount} hari izin` : ""}
           </span>
         </div>
 
         <div className="space-y-4">
-          {daysBreakdown.slice(0, 5).map((day) => (
-            <Card
-              key={day.dateStr}
-              className={`border transition-all ${
-                day.hasActivity
-                  ? "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs"
-                  : "border-dashed border-slate-200 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-950/30 opacity-75"
-              }`}
-            >
-              {/* Day Header */}
-              <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-slate-50/60 dark:bg-slate-950/50 rounded-t-xl">
-                <div className="flex items-center gap-2.5">
-                  <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-600 text-white shadow-xs">
-                    {day.label}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    {day.formattedDate}
-                  </span>
+          {daysBreakdown.slice(0, 5).map((day) => {
+            const isSickDay = day.hasSick;
+            const isPermissionDay = day.hasPermission;
+            const isHolidayDay = day.hasHoliday;
+
+            return (
+              <Card
+                key={day.dateStr}
+                className={`border transition-all ${
+                  isSickDay
+                    ? "border-rose-300 dark:border-rose-900/60 bg-rose-50/30 dark:bg-rose-950/20 shadow-xs"
+                    : isPermissionDay
+                    ? "border-amber-300 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 shadow-xs"
+                    : isHolidayDay
+                    ? "border-purple-300 dark:border-purple-900/60 bg-purple-50/30 dark:bg-purple-950/20 shadow-xs"
+                    : day.hasActivity
+                    ? "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs"
+                    : "border-dashed border-slate-200 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-950/30 opacity-75"
+                }`}
+              >
+                {/* Day Header */}
+                <div className={`px-4 py-3 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-t-xl ${
+                  isSickDay
+                    ? "bg-rose-100/60 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900/50"
+                    : isPermissionDay
+                    ? "bg-amber-100/60 dark:bg-amber-950/50 border-amber-200 dark:border-amber-900/50"
+                    : isHolidayDay
+                    ? "bg-purple-100/60 dark:bg-purple-950/50 border-purple-200 dark:border-purple-900/50"
+                    : "bg-slate-50/60 dark:bg-slate-950/50 border-slate-100 dark:border-slate-800"
+                }`}>
+                  <div className="flex items-center gap-2.5">
+                    <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs font-extrabold text-white shadow-xs ${
+                      isSickDay ? "bg-rose-600" : isPermissionDay ? "bg-amber-600" : isHolidayDay ? "bg-purple-600" : "bg-blue-600"
+                    }`}>
+                      {day.label}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      {day.formattedDate}
+                    </span>
+                    {isSickDay && <span className="text-[11px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded-md">🏥 Izin Sakit</span>}
+                    {isPermissionDay && <span className="text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-md">📄 Izin / Cuti</span>}
+                    {isHolidayDay && <span className="text-[11px] font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-md">🏖️ Libur</span>}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" /> Total: {day.hours} Jam
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      ({day.dayLogs.length} catatan)
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" /> Total: {day.hours} Jam
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    ({day.dayLogs.length} aktivitas)
-                  </span>
-                </div>
-              </div>
+                {/* Day Content */}
+                <CardContent className="p-4">
+                  {day.dayLogs.length === 0 ? (
+                    <div className="py-3 text-center text-xs text-slate-400 italic">
+                      Tidak ada catatan aktivitas kerja pada hari ini.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {day.dayLogs.map((log: any) => {
+                        const category = categories.find((c) => c.id === log.categoryId);
+                        const isSick = log.status === "SICK";
+                        const isPerm = log.status === "PERMISSION";
+                        const isHoli = log.status === "HOLIDAY";
 
-              {/* Day Content */}
-              <CardContent className="p-4">
-                {day.dayLogs.length === 0 ? (
-                  <div className="py-3 text-center text-xs text-slate-400 italic">
-                    Tidak ada catatan aktivitas kerja pada hari ini.
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {day.dayLogs.map((log: any, logIdx: number) => {
-                      const category = categories.find((c) => c.id === log.categoryId);
-                      const colorHex = category?.colorHex || "#3b82f6";
+                        const colorHex = isSick ? "#f43f5e" : isPerm ? "#f59e0b" : isHoli ? "#a855f7" : category?.colorHex || "#3b82f6";
 
-                      return (
-                        <div
-                          key={log.id}
-                          className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 space-y-2"
-                        >
-                          {/* Title & Time */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className="h-2.5 w-2.5 rounded-full shrink-0"
-                                  style={{ backgroundColor: colorHex }}
-                                />
-                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
-                                  {log.title}
-                                </h4>
+                        return (
+                          <div
+                            key={log.id}
+                            className={`p-3.5 rounded-xl border space-y-2 ${
+                              isSick
+                                ? "border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/30"
+                                : isPerm
+                                ? "border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/30"
+                                : isHoli
+                                ? "border-purple-200 dark:border-purple-900/50 bg-purple-50/50 dark:bg-purple-950/30"
+                                : "border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40"
+                            }`}
+                          >
+                            {/* Title & Time */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="h-2.5 w-2.5 rounded-full shrink-0"
+                                    style={{ backgroundColor: colorHex }}
+                                  />
+                                  <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                                    {log.title}
+                                  </h4>
+                                </div>
+                                <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 pl-4.5 font-mono">
+                                  <span>{isSick || isPerm || isHoli ? "Presensi Khusus" : `${formatTime(log.startTime)} - ${formatTime(log.endTime)}`}</span>
+                                  <span>&bull;</span>
+                                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                                    {category?.name || "Umum"}
+                                  </span>
+                                  {log.location && (
+                                    <>
+                                      <span>&bull;</span>
+                                      <span>{log.location}</span>
+                                    </>
+                                  )}
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 pl-4.5 font-mono">
-                                <span>{formatTime(log.startTime)} - {formatTime(log.endTime)}</span>
-                                <span>&bull;</span>
-                                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                                  {category?.name || "Umum"}
-                                </span>
-                                {log.location && (
-                                  <>
-                                    <span>&bull;</span>
-                                    <span>{log.location}</span>
-                                  </>
-                                )}
-                              </div>
+
+                              <StatusBadge status={log.status} />
                             </div>
 
-                            <StatusBadge status={log.status} />
-                          </div>
-
-                          {/* Description & Output Result */}
-                          <div className="pl-4.5 space-y-1 text-xs">
-                            <p className="text-slate-600 dark:text-slate-300">
-                              {log.description}
-                            </p>
-                            <div className="p-2 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-200 text-xs">
-                              <strong>Output / Hasil Capaian:</strong> {log.outputResult}
+                            {/* Description & Output Result */}
+                            <div className="pl-4.5 space-y-1 text-xs">
+                              <p className="text-slate-600 dark:text-slate-300">
+                                {log.description}
+                              </p>
+                              {log.outputResult && (
+                                <div className={`p-2 rounded-lg border text-xs ${
+                                  isSick
+                                    ? "bg-rose-100/60 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200"
+                                    : isPerm
+                                    ? "bg-amber-100/60 dark:bg-amber-950/50 border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200"
+                                    : "bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-200"
+                                }`}>
+                                  <strong>{isSick ? "Keterangan Medis / Surat Dokter:" : isPerm ? "Keterangan Izin:" : "Output / Hasil Capaian:"}</strong> {log.outputResult}
+                                </div>
+                              )}
+                              {log.notes && (
+                                <div className="p-2 rounded-lg bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 text-amber-900 dark:text-amber-200 text-xs">
+                                  <strong>Catatan:</strong> {log.notes}
+                                </div>
+                              )}
                             </div>
-                            {log.notes && (
-                              <div className="p-2 rounded-lg bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 text-amber-900 dark:text-amber-200 text-xs">
-                                <strong>Catatan / Kendala:</strong> {log.notes}
-                              </div>
-                            )}
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

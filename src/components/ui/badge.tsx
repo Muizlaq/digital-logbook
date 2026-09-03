@@ -12,12 +12,12 @@ const badgeVariants = cva(
         secondary:
           "border-transparent bg-slate-100 text-slate-900 hover:bg-slate-100/80",
         destructive:
-          "border-transparent bg-rose-100 text-rose-700 hover:bg-rose-200",
-        outline: "text-slate-950 border-slate-200",
-        success: "border-transparent bg-emerald-100 text-emerald-800",
-        warning: "border-transparent bg-amber-100 text-amber-800",
-        info: "border-transparent bg-blue-100 text-blue-800",
-        purple: "border-transparent bg-purple-100 text-purple-800",
+          "border-transparent bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-200 border-rose-200 dark:border-rose-900/50",
+        outline: "text-slate-950 dark:text-slate-100 border-slate-200 dark:border-slate-800",
+        success: "border-transparent bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50",
+        warning: "border-transparent bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50",
+        info: "border-transparent bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-900/50",
+        purple: "border-transparent bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-900/50",
       },
     },
     defaultVariants: {
@@ -47,7 +47,13 @@ export function StatusBadge({ status }: { status: string }) {
       return <Badge variant="info">⚡ Sedang Dikerjakan</Badge>;
     case "DRAFT":
     case "REJECTED":
-      return <Badge variant="warning">📝 Draf / Rencana</Badge>;
+      return <Badge variant="secondary">📝 Draf / Rencana</Badge>;
+    case "SICK":
+      return <Badge variant="destructive">🏥 Sakit</Badge>;
+    case "PERMISSION":
+      return <Badge variant="warning">📄 Izin / Cuti</Badge>;
+    case "HOLIDAY":
+      return <Badge variant="purple">🏖️ Libur</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }

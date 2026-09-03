@@ -15,25 +15,32 @@ export const logBookFormSchema = z
     startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Format waktu mulai harus HH:mm"),
     endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Format waktu selesai harus HH:mm"),
     categoryId: z.string().optional().nullable(),
-    location: z.string().min(2, "Lokasi kerja minimal 2 karakter").default("Kantor / WFH"),
+    location: z.string().default("Kantor / WFH"),
     title: z
       .string()
       .min(3, "Judul aktivitas minimal 3 karakter")
       .max(200, "Judul aktivitas maksimal 200 karakter"),
     description: z
       .string()
-      .min(5, "Deskripsi aktivitas minimal 5 karakter")
-      .max(3000, "Deskripsi aktivitas maksimal 3000 karakter"),
+      .min(3, "Deskripsi minimal 3 karakter")
+      .max(3000, "Deskripsi maksimal 3000 karakter"),
     outputResult: z
       .string()
-      .min(3, "Hasil output minimal 3 karakter")
-      .max(1500, "Hasil output maksimal 1500 karakter"),
+      .max(1500, "Hasil output maksimal 1500 karakter")
+      .optional()
+      .default(""),
     notes: z.string().optional().nullable(),
-    status: z.enum(["COMPLETED", "IN_PROGRESS", "DRAFT"]).default("COMPLETED"),
+    status: z
+      .enum(["COMPLETED", "IN_PROGRESS", "DRAFT", "SICK", "PERMISSION", "HOLIDAY"])
+      .default("COMPLETED"),
     attachments: z.array(logBookAttachmentSchema).optional(),
   })
   .refine(
     (data) => {
+      // For Sick, Permission, or Holiday, end time validation can be relaxed
+      if (data.status === "SICK" || data.status === "PERMISSION" || data.status === "HOLIDAY") {
+        return true;
+      }
       if (!data.startTime || !data.endTime) return true;
       return data.endTime > data.startTime;
     },
