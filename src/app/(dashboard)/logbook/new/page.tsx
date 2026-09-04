@@ -31,7 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { AttendanceCalendarPicker } from "@/components/logbook/attendance-calendar-picker";
+import { AttendanceCalendarPicker, NATIONAL_HOLIDAYS } from "@/components/logbook/attendance-calendar-picker";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -127,6 +127,8 @@ export default function NewPersonalLogBookPage() {
 
     // If an existing record exists on that date, optionally pre-fill or alert
     const record = existingLogbooks.find((lb: any) => lb.activityDate === dateStr);
+    const holidayName = NATIONAL_HOLIDAYS[dateStr];
+
     if (record) {
       setValue("startTime", record.startTime || "08:30");
       setValue("endTime", record.endTime || "17:00");
@@ -139,6 +141,18 @@ export default function NewPersonalLogBookPage() {
       setValue("status", record.status || "COMPLETED");
       setAttachments(record.attachments || []);
       toast.info(`Memuat data catatan untuk ${formatDate(dateStr)}`);
+    } else if (holidayName) {
+      // Auto-set as National Holiday
+      setValue("status", "HOLIDAY");
+      setValue("title", `Hari Libur Nasional: ${holidayName}`);
+      setValue("location", "Libur Resmi");
+      setValue("description", `Hari Libur Resmi Nasional (${holidayName}).`);
+      setValue("outputResult", "Libur Nasional");
+      setValue("notes", "Libur resmi kalender nasional.");
+      setValue("startTime", "08:00");
+      setValue("endTime", "17:00");
+      setAttachments([]);
+      toast.info(`Tanggal ini adalah Hari Libur Nasional: ${holidayName}`);
     } else {
       // Reset to clean state for new record
       setValue("title", "");
@@ -334,6 +348,20 @@ export default function NewPersonalLogBookPage() {
             <span>Waktu Server: <strong className="font-mono text-blue-600 dark:text-blue-400">{serverTime || "10.43.44 WIB (GMT+7)"}</strong></span>
           </div>
         </div>
+
+        {NATIONAL_HOLIDAYS[selectedDate] && (
+          <div className="p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/40 flex items-center justify-between text-xs text-rose-900 dark:text-rose-200">
+            <div className="flex items-center gap-2">
+              <Palmtree className="h-4 w-4 text-rose-600 shrink-0" />
+              <span>
+                <strong>Hari Libur Nasional:</strong> {NATIONAL_HOLIDAYS[selectedDate]}. Form otomatis disesuaikan untuk status Libur Resmi.
+              </span>
+            </div>
+            <span className="font-bold text-[11px] bg-rose-600 text-white px-2 py-0.5 rounded-md">
+              Libur Resmi
+            </span>
+          </div>
+        )}
 
         {existingRecordForSelectedDate && (
           <div className="p-3.5 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/40 flex items-center justify-between text-xs text-blue-900 dark:text-blue-200">

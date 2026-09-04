@@ -4,12 +4,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  Check,
-  Circle,
-  Square,
-  Triangle,
-  X,
-  Diamond,
+  Sparkles,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
 export interface AttendanceRecord {
@@ -34,6 +30,17 @@ const DAYS_OF_WEEK = [
   { key: "sat", label: "Sab", isWeekend: true },
   { key: "sun", label: "Min", isWeekend: true },
 ];
+
+// Official Indonesian National Holidays (10 Aug 2026 - 9 Feb 2027)
+export const NATIONAL_HOLIDAYS: Record<string, string> = {
+  "2026-08-17": "Hari Kemerdekaan RI (HUT RI ke-81)",
+  "2026-08-25": "Maulid Nabi Muhammad SAW",
+  "2026-12-25": "Hari Raya Natal",
+  "2026-12-26": "Cuti Bersama Hari Raya Natal",
+  "2027-01-01": "Tahun Baru 2027 Masehi",
+  "2027-02-05": "Isra Mi'raj Nabi Muhammad SAW",
+  "2027-02-06": "Tahun Baru Imlek 2578 Kongzili",
+};
 
 // Definition of the 6 Internship Periods: 10 Agustus 2026 - 9 Februari 2027
 export const INTERNSHIP_PERIODS = [
@@ -141,6 +148,8 @@ export function AttendanceCalendarPicker({
       dateStr: string;
       isCurrentPeriod: boolean;
       isWeekend: boolean;
+      isNationalHoliday: boolean;
+      holidayName?: string;
       isBlank?: boolean;
     }
 
@@ -161,6 +170,7 @@ export function AttendanceCalendarPicker({
         dateStr: `blank-start-${i}`,
         isCurrentPeriod: false,
         isWeekend: i >= 5,
+        isNationalHoliday: false,
         isBlank: true,
       });
     }
@@ -173,12 +183,15 @@ export function AttendanceCalendarPicker({
       const d = String(cur.getDate()).padStart(2, "0");
       const dateStr = `${y}-${m}-${d}`;
       const dayOfWeek = (cur.getDay() + 6) % 7;
+      const isHoliday = Boolean(NATIONAL_HOLIDAYS[dateStr]);
 
       cells.push({
         dayNumber: cur.getDate(),
         dateStr,
         isCurrentPeriod: true,
         isWeekend: dayOfWeek >= 5,
+        isNationalHoliday: isHoliday,
+        holidayName: NATIONAL_HOLIDAYS[dateStr],
         isBlank: false,
       });
 
@@ -194,6 +207,7 @@ export function AttendanceCalendarPicker({
         dateStr: `blank-end-${i}`,
         isCurrentPeriod: false,
         isWeekend: colIdx >= 5,
+        isNationalHoliday: false,
         isBlank: true,
       });
     }
@@ -201,13 +215,18 @@ export function AttendanceCalendarPicker({
     return cells;
   }, [currentPeriod]);
 
+  // List of national holidays within this active period
+  const holidaysInPeriod = useMemo(() => {
+    return calendarCells.filter((c) => !c.isBlank && c.isNationalHoliday);
+  }, [calendarCells]);
+
   // Status icon renderer
   const renderCellStatus = (cell: (typeof calendarCells)[0], isSelected: boolean) => {
     if (cell.isBlank) return null;
 
     const record = attendanceMap.get(cell.dateStr);
 
-    // If there is an existing record
+    // If there is an existing recorded logbook
     if (record) {
       if (record.status === "COMPLETED" || record.status === "IN_PROGRESS") {
         return (
@@ -230,8 +249,8 @@ export function AttendanceCalendarPicker({
       }
     }
 
-    // Weekend default mark
-    if (cell.isWeekend) {
+    // National Holiday or Weekend default mark
+    if (cell.isNationalHoliday || cell.isWeekend) {
       return <span className="h-2 w-2 bg-slate-800 dark:bg-slate-300 inline-block rounded-[1px]" />;
     }
 
@@ -297,7 +316,7 @@ export function AttendanceCalendarPicker({
           {DAYS_OF_WEEK.map((d) => (
             <div
               key={d.key}
-              className={d.isWeekend ? "text-slate-500 dark:text-slate-400" : "text-slate-700 dark:text-slate-300"}
+              className={d.isWeekend ? "text-rose-500 dark:text-rose-400" : "text-slate-700 dark:text-slate-300"}
             >
               {d.label}
             </div>
@@ -326,14 +345,17 @@ export function AttendanceCalendarPicker({
                 type="button"
                 key={idx}
                 onClick={() => onSelectDate(cell.dateStr)}
+                title={cell.isNationalHoliday ? `${cell.holidayName} (Libur Nasional)` : undefined}
                 className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer relative group h-14 ${
-                  cell.isWeekend
-                    ? "bg-slate-50/80 dark:bg-slate-950/50"
-                    : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                  cell.isNationalHoliday
+                    ? "bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-900/40"
+                    : cell.isWeekend
+                    ? "bg-slate-50/80 dark:bg-slate-950/50 border border-transparent"
+                    : "hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent"
                 } ${
                   isSelected
-                    ? "border-2 border-blue-600 bg-blue-50/80 dark:bg-blue-950/60 shadow-xs z-10"
-                    : "border border-transparent"
+                    ? "border-2 border-blue-600 bg-blue-50/90 dark:bg-blue-950/70 shadow-xs z-10"
+                    : ""
                 }`}
               >
                 {/* Date Number */}
@@ -341,6 +363,8 @@ export function AttendanceCalendarPicker({
                   className={`text-xs font-semibold mb-1 flex items-center justify-center ${
                     isSelected
                       ? "bg-blue-600 text-white font-bold h-6 px-2 rounded-md shadow-xs"
+                      : cell.isNationalHoliday || cell.isWeekend
+                      ? "text-rose-600 dark:text-rose-400 font-bold"
                       : "text-slate-800 dark:text-slate-200"
                   }`}
                 >
@@ -356,13 +380,32 @@ export function AttendanceCalendarPicker({
                 {hasLogbook && !isSelected && (
                   <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-blue-500" />
                 )}
+
+                {/* Small red dot for national holiday */}
+                {cell.isNationalHoliday && !isSelected && (
+                  <span className="absolute top-1 left-1 h-1.5 w-1.5 rounded-full bg-rose-500" title={cell.holidayName} />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 3. Legend / Keterangan Status Presensi (Kemnaker Standard) */}
+      {/* 3. National Holidays in this Period (Info Bar) */}
+      {holidaysInPeriod.length > 0 && (
+        <div className="px-4 py-2.5 bg-rose-50/60 dark:bg-rose-950/30 border-t border-rose-100 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-300 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span className="font-bold flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-rose-600" /> Libur Nasional Periode Ini:
+          </span>
+          {holidaysInPeriod.map((h) => (
+            <span key={h.dateStr} className="text-[11px] bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/50">
+              <strong>{h.dayNumber} {new Intl.DateTimeFormat("id-ID", { month: "short" }).format(new Date(h.dateStr))}</strong>: {h.holidayName}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Legend / Keterangan Status Presensi (Kemnaker Standard) */}
       <div className="px-4 py-3.5 bg-slate-50/70 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-[11px] text-slate-700 dark:text-slate-300 font-medium">
         <div className="flex items-center gap-1.5">
           <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">✓</span>
