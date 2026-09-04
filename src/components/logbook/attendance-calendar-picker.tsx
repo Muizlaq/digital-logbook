@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,7 +10,6 @@ import {
   Triangle,
   X,
   Diamond,
-  Calendar as CalendarIcon,
 } from "lucide-react";
 
 export interface AttendanceRecord {
@@ -36,31 +35,96 @@ const DAYS_OF_WEEK = [
   { key: "sun", label: "Min", isWeekend: true },
 ];
 
+// Definition of the 6 Internship Periods: 10 Agustus 2026 - 9 Februari 2027
+export const INTERNSHIP_PERIODS = [
+  {
+    periodNumber: 1,
+    title: "Periode 1",
+    label: "10 Agu 2026 - 9 Sep 2026",
+    startDate: "2026-08-10",
+    endDate: "2026-09-09",
+  },
+  {
+    periodNumber: 2,
+    title: "Periode 2",
+    label: "10 Sep 2026 - 9 Okt 2026",
+    startDate: "2026-09-10",
+    endDate: "2026-10-09",
+  },
+  {
+    periodNumber: 3,
+    title: "Periode 3",
+    label: "10 Okt 2026 - 9 Nov 2026",
+    startDate: "2026-10-10",
+    endDate: "2026-11-09",
+  },
+  {
+    periodNumber: 4,
+    title: "Periode 4",
+    label: "10 Nov 2026 - 9 Des 2026",
+    startDate: "2026-11-10",
+    endDate: "2026-12-09",
+  },
+  {
+    periodNumber: 5,
+    title: "Periode 5",
+    label: "10 Des 2026 - 9 Jan 2027",
+    startDate: "2026-12-10",
+    endDate: "2027-01-09",
+  },
+  {
+    periodNumber: 6,
+    title: "Periode 6",
+    label: "10 Jan 2027 - 9 Feb 2027",
+    startDate: "2027-01-10",
+    endDate: "2027-02-09",
+  },
+];
+
 export function AttendanceCalendarPicker({
   selectedDate,
   onSelectDate,
   existingLogbooks = [],
 }: AttendanceCalendarPickerProps) {
-  // Determine current active date state for navigation
-  const initialDate = selectedDate ? new Date(selectedDate) : new Date();
-  const [viewDate, setViewDate] = useState<Date>(
-    isNaN(initialDate.getTime()) ? new Date() : initialDate
-  );
+  // Find which period matches the current selectedDate
+  const initialPeriodIndex = useMemo(() => {
+    if (!selectedDate) return 0;
+    const foundIdx = INTERNSHIP_PERIODS.findIndex(
+      (p) => selectedDate >= p.startDate && selectedDate <= p.endDate
+    );
+    return foundIdx !== -1 ? foundIdx : 0;
+  }, [selectedDate]);
 
-  const year = viewDate.getFullYear();
-  const month = viewDate.getMonth();
+  const [currentPeriodIdx, setCurrentPeriodIdx] = useState<number>(initialPeriodIndex);
 
-  // Navigation handlers
+  // Sync current period if selectedDate changes externally
+  useEffect(() => {
+    if (selectedDate) {
+      const idx = INTERNSHIP_PERIODS.findIndex(
+        (p) => selectedDate >= p.startDate && selectedDate <= p.endDate
+      );
+      if (idx !== -1) {
+        setCurrentPeriodIdx(idx);
+      }
+    }
+  }, [selectedDate]);
+
+  const currentPeriod = INTERNSHIP_PERIODS[currentPeriodIdx];
+
   const handlePrevPeriod = () => {
-    setViewDate(new Date(year, month - 1, 1));
+    if (currentPeriodIdx > 0) {
+      setCurrentPeriodIdx((prev) => prev - 1);
+    }
   };
 
   const handleNextPeriod = () => {
-    setViewDate(new Date(year, month + 1, 1));
+    if (currentPeriodIdx < INTERNSHIP_PERIODS.length - 1) {
+      setCurrentPeriodIdx((prev) => prev + 1);
+    }
   };
 
-  // Build a fast lookup map for existing attendance
-  const attendanceMap = React.useMemo(() => {
+  // Fast map lookup for existing attendance
+  const attendanceMap = useMemo(() => {
     const map = new Map<string, any>();
     existingLogbooks.forEach((item) => {
       if (item.activityDate) {
@@ -70,82 +134,77 @@ export function AttendanceCalendarPicker({
     return map;
   }, [existingLogbooks]);
 
-  // Calculate 30-day range / monthly calendar dates
-  // Calculate first day of the month & last day
-  const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
+  // Build calendar matrix strictly for the current period (from startDate to endDate)
+  const calendarCells = useMemo(() => {
+    interface CalendarCell {
+      dayNumber: number;
+      dateStr: string;
+      isCurrentPeriod: boolean;
+      isWeekend: boolean;
+      isBlank?: boolean;
+    }
 
-  // Month formatted title
-  const monthName = new Intl.DateTimeFormat("id-ID", { month: "short" }).format(viewDate);
-  const fullMonthYear = new Intl.DateTimeFormat("id-ID", {
-    month: "long",
-    year: "numeric",
-  }).format(viewDate);
+    const cells: CalendarCell[] = [];
+    const [startYear, startMonth, startDay] = currentPeriod.startDate.split("-").map(Number);
+    const [endYear, endMonth, endDay] = currentPeriod.endDate.split("-").map(Number);
 
-  // Calculate period title (e.g. "Periode 1" or "Periode September 2026")
-  // Format range: "1 [Bulan] [Tahun] - [Akhir] [Bulan] [Tahun]"
-  const periodLabel = `Periode ${month + 1}`;
-  const periodDateRange = `1 ${monthName} ${year} - ${lastDayOfMonth.getDate()} ${monthName} ${year}`;
+    const start = new Date(startYear, startMonth - 1, startDay);
+    const end = new Date(endYear, endMonth - 1, endDay);
 
-  // Calculate calendar grid cells starting from Monday (Senin)
-  let firstDayIndex = firstDayOfMonth.getDay() - 1;
-  if (firstDayIndex === -1) firstDayIndex = 6; // Sunday -> index 6
+    // Day of week for start (0=Sun, 1=Mon, ..., 6=Sat) -> transform so Mon=0, Sun=6
+    let leadingBlankCount = (start.getDay() + 6) % 7;
 
-  const daysInMonth = lastDayOfMonth.getDate();
-  const daysInPrevMonth = new Date(year, month, 0).getDate();
+    // Add blank leading cells if period does not start on Monday
+    for (let i = 0; i < leadingBlankCount; i++) {
+      cells.push({
+        dayNumber: 0,
+        dateStr: `blank-start-${i}`,
+        isCurrentPeriod: false,
+        isWeekend: i >= 5,
+        isBlank: true,
+      });
+    }
 
-  interface CalendarCell {
-    dayNumber: number;
-    dateStr: string;
-    isCurrentMonth: boolean;
-    isWeekend: boolean;
-  }
+    // Loop through all days in this period
+    const cur = new Date(start);
+    while (cur <= end) {
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth() + 1).padStart(2, "0");
+      const d = String(cur.getDate()).padStart(2, "0");
+      const dateStr = `${y}-${m}-${d}`;
+      const dayOfWeek = (cur.getDay() + 6) % 7;
 
-  const calendarCells: CalendarCell[] = [];
+      cells.push({
+        dayNumber: cur.getDate(),
+        dateStr,
+        isCurrentPeriod: true,
+        isWeekend: dayOfWeek >= 5,
+        isBlank: false,
+      });
 
-  // Trailing days from prev month
-  for (let i = firstDayIndex - 1; i >= 0; i--) {
-    const d = daysInPrevMonth - i;
-    const dateObj = new Date(year, month - 1, d);
-    const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const dayOfWeek = (dateObj.getDay() + 6) % 7;
-    calendarCells.push({
-      dayNumber: d,
-      dateStr,
-      isCurrentMonth: false,
-      isWeekend: dayOfWeek >= 5,
-    });
-  }
+      cur.setDate(cur.getDate() + 1);
+    }
 
-  // Current month days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateObj = new Date(year, month, d);
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const dayOfWeek = (dateObj.getDay() + 6) % 7;
-    calendarCells.push({
-      dayNumber: d,
-      dateStr,
-      isCurrentMonth: true,
-      isWeekend: dayOfWeek >= 5,
-    });
-  }
+    // Trailing blank cells to complete the 7-column row
+    const trailingBlankCount = (7 - (cells.length % 7)) % 7;
+    for (let i = 0; i < trailingBlankCount; i++) {
+      const colIdx = (leadingBlankCount + cells.length) % 7;
+      cells.push({
+        dayNumber: 0,
+        dateStr: `blank-end-${i}`,
+        isCurrentPeriod: false,
+        isWeekend: colIdx >= 5,
+        isBlank: true,
+      });
+    }
 
-  // Next month leading days to complete grid rows
-  const remainingCells = (7 - (calendarCells.length % 7)) % 7;
-  for (let d = 1; d <= remainingCells; d++) {
-    const dateObj = new Date(year, month + 1, d);
-    const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const dayOfWeek = (dateObj.getDay() + 6) % 7;
-    calendarCells.push({
-      dayNumber: d,
-      dateStr,
-      isCurrentMonth: false,
-      isWeekend: dayOfWeek >= 5,
-    });
-  }
+    return cells;
+  }, [currentPeriod]);
 
-  // Function to render status icon for each cell
+  // Status icon renderer
   const renderCellStatus = (cell: (typeof calendarCells)[0], isSelected: boolean) => {
+    if (cell.isBlank) return null;
+
     const record = attendanceMap.get(cell.dateStr);
 
     // If there is an existing record
@@ -161,7 +220,7 @@ export function AttendanceCalendarPicker({
         return <span className="h-2 w-2 rounded-full bg-rose-600 dark:bg-rose-500 inline-block" />;
       }
       if (record.status === "PERMISSION") {
-        return <span className="text-amber-500 text-[10px] leading-none">▲</span>;
+        return <span className="text-amber-500 text-[10px] leading-none font-bold">▲</span>;
       }
       if (record.status === "HOLIDAY") {
         return <span className="h-2 w-2 bg-slate-800 dark:bg-slate-300 inline-block rounded-[1px]" />;
@@ -171,19 +230,19 @@ export function AttendanceCalendarPicker({
       }
     }
 
-    // Default status if weekend
+    // Weekend default mark
     if (cell.isWeekend) {
       return <span className="h-2 w-2 bg-slate-800 dark:bg-slate-300 inline-block rounded-[1px]" />;
     }
 
-    // If selected and no record yet
+    // If selected and no record
     if (isSelected) {
       return (
         <span className="h-2.5 w-2.5 rounded-full border border-blue-600 dark:border-blue-400 inline-block" />
       );
     }
 
-    // If past or unfilled workday
+    // Workday with no logbook yet
     return (
       <span className="h-2 w-2 rounded-full border border-slate-400 dark:border-slate-500 inline-block" />
     );
@@ -191,12 +250,17 @@ export function AttendanceCalendarPicker({
 
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all">
-      {/* 1. Header Navigation Bar (Kemnaker Style) */}
+      {/* 1. Header Navigation Bar (Kemnaker Period Header) */}
       <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
         <button
           type="button"
           onClick={handlePrevPeriod}
-          className="h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
+          disabled={currentPeriodIdx === 0}
+          className={`h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors shadow-2xs ${
+            currentPeriodIdx === 0
+              ? "opacity-30 cursor-not-allowed"
+              : "hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+          }`}
           title="Periode Sebelumnya"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -204,17 +268,22 @@ export function AttendanceCalendarPicker({
 
         <div className="text-center">
           <div className="text-sm font-bold text-slate-900 dark:text-slate-100">
-            {periodLabel}
+            {currentPeriod.title}
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            {periodDateRange}
+            {currentPeriod.label}
           </div>
         </div>
 
         <button
           type="button"
           onClick={handleNextPeriod}
-          className="h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-2xs"
+          disabled={currentPeriodIdx === INTERNSHIP_PERIODS.length - 1}
+          className={`h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors shadow-2xs ${
+            currentPeriodIdx === INTERNSHIP_PERIODS.length - 1
+              ? "opacity-30 cursor-not-allowed"
+              : "hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+          }`}
           title="Periode Berikutnya"
         >
           <ChevronRight className="h-4 w-4" />
@@ -238,6 +307,17 @@ export function AttendanceCalendarPicker({
         {/* Date Matrix */}
         <div className="grid grid-cols-7 gap-y-1.5 pt-2">
           {calendarCells.map((cell, idx) => {
+            if (cell.isBlank) {
+              return (
+                <div
+                  key={idx}
+                  className={`h-14 rounded-xl flex items-center justify-center ${
+                    cell.isWeekend ? "bg-slate-50/40 dark:bg-slate-950/20" : ""
+                  }`}
+                />
+              );
+            }
+
             const isSelected = cell.dateStr === selectedDate;
             const hasLogbook = attendanceMap.has(cell.dateStr);
 
@@ -246,24 +326,22 @@ export function AttendanceCalendarPicker({
                 type="button"
                 key={idx}
                 onClick={() => onSelectDate(cell.dateStr)}
-                className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl transition-all cursor-pointer relative group ${
+                className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer relative group h-14 ${
                   cell.isWeekend
-                    ? "bg-slate-50/70 dark:bg-slate-950/40"
+                    ? "bg-slate-50/80 dark:bg-slate-950/50"
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
                 } ${
                   isSelected
                     ? "border-2 border-blue-600 bg-blue-50/80 dark:bg-blue-950/60 shadow-xs z-10"
                     : "border border-transparent"
-                } ${!cell.isCurrentMonth ? "opacity-35 hover:opacity-80" : ""}`}
+                }`}
               >
                 {/* Date Number */}
                 <div
-                  className={`text-xs font-semibold mb-1.5 flex items-center justify-center ${
+                  className={`text-xs font-semibold mb-1 flex items-center justify-center ${
                     isSelected
                       ? "bg-blue-600 text-white font-bold h-6 px-2 rounded-md shadow-xs"
-                      : cell.isCurrentMonth
-                      ? "text-slate-800 dark:text-slate-200"
-                      : "text-slate-400 dark:text-slate-600"
+                      : "text-slate-800 dark:text-slate-200"
                   }`}
                 >
                   {cell.dayNumber}
@@ -274,7 +352,7 @@ export function AttendanceCalendarPicker({
                   {renderCellStatus(cell, isSelected)}
                 </div>
 
-                {/* Small indicator if logbook has attachments or notes */}
+                {/* Small indicator if logbook exists */}
                 {hasLogbook && !isSelected && (
                   <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-blue-500" />
                 )}

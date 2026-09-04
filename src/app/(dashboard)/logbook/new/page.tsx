@@ -461,6 +461,8 @@ export default function NewPersonalLogBookPage() {
                 <div className="flex items-center gap-2">
                   <Input
                     type="date"
+                    min="2026-08-10"
+                    max="2027-02-09"
                     className="text-xs font-semibold dark:bg-slate-950 dark:border-slate-800 bg-slate-50"
                     value={selectedDate}
                     onChange={(e) => handleDateSelect(e.target.value)}
