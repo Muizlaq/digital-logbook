@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Clock,
@@ -20,6 +20,10 @@ import {
   CalendarCheck,
   Palmtree,
   FileText,
+  Calendar as CalendarIcon,
+  CheckCircle2,
+  Edit,
+  ExternalLink,
 } from "lucide-react";
 import { logBookFormSchema, LogBookFormInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
@@ -27,15 +31,46 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { AttendanceCalendarPicker } from "@/components/logbook/attendance-calendar-picker";
+import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 
 export default function NewPersonalLogBookPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [attachments, setAttachments] = useState<any[]>([]);
 
-  // Master Data
+  // Real-time server time state
+  const [serverTime, setServerTime] = useState<string>("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      setServerTime(`${hours}.${minutes}.${seconds} WIB (GMT+7)`);
+    };
+
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Today initial date (YYYY-MM-DD)
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, []);
+
+  const initialDate = searchParams.get("date") || todayStr;
+  const [selectedDate, setSelectedDate] = useState<string>(initialDate);
+
+  // Fetch Master Data (Categories, etc.)
   const { data: masterData } = useQuery({
     queryKey: ["master-data"],
     queryFn: async () => {
@@ -45,18 +80,34 @@ export default function NewPersonalLogBookPage() {
     },
   });
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // Fetch existing logbooks to show attendance status on calendar
+  const { data: logbooksData } = useQuery({
+    queryKey: ["all-logbooks-calendar"],
+    queryFn: async () => {
+      const res = await fetch("/api/logbooks?limit=500");
+      const json = await res.json();
+      return json.data;
+    },
+  });
+
+  const existingLogbooks = logbooksData?.items || [];
+
+  // Check if current selected date already has a logbook
+  const existingRecordForSelectedDate = useMemo(() => {
+    return existingLogbooks.find((lb: any) => lb.activityDate === selectedDate);
+  }, [existingLogbooks, selectedDate]);
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     setValue,
     formState: { errors },
   } = useForm<LogBookFormInput>({
     resolver: zodResolver(logBookFormSchema) as any,
     defaultValues: {
-      activityDate: todayStr,
+      activityDate: selectedDate,
       startTime: "08:30",
       endTime: "17:00",
       categoryId: "",
@@ -68,6 +119,39 @@ export default function NewPersonalLogBookPage() {
       status: "COMPLETED",
     },
   });
+
+  // When selectedDate changes via Calendar click, update form
+  const handleDateSelect = (dateStr: string) => {
+    setSelectedDate(dateStr);
+    setValue("activityDate", dateStr);
+
+    // If an existing record exists on that date, optionally pre-fill or alert
+    const record = existingLogbooks.find((lb: any) => lb.activityDate === dateStr);
+    if (record) {
+      setValue("startTime", record.startTime || "08:30");
+      setValue("endTime", record.endTime || "17:00");
+      setValue("categoryId", record.categoryId || "");
+      setValue("location", record.location || "Kantor / Meja Kerja");
+      setValue("title", record.title || "");
+      setValue("description", record.description || "");
+      setValue("outputResult", record.outputResult || "");
+      setValue("notes", record.notes || "");
+      setValue("status", record.status || "COMPLETED");
+      setAttachments(record.attachments || []);
+      toast.info(`Memuat data catatan untuk ${formatDate(dateStr)}`);
+    } else {
+      // Reset to clean state for new record
+      setValue("title", "");
+      setValue("description", "");
+      setValue("outputResult", "");
+      setValue("notes", "");
+      setValue("status", "COMPLETED");
+      setValue("startTime", "08:30");
+      setValue("endTime", "17:00");
+      setValue("location", "Kantor / Meja Kerja");
+      setAttachments([]);
+    }
+  };
 
   const currentStatus = watch("status");
   const startTime = watch("startTime");
@@ -169,14 +253,26 @@ export default function NewPersonalLogBookPage() {
     try {
       const payload = {
         ...data,
+        activityDate: selectedDate, // ensure locked to selected calendar date
         attachments,
       };
 
-      const res = await fetch("/api/logbooks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      let res;
+      if (existingRecordForSelectedDate?.id) {
+        // Update existing record
+        res = await fetch(`/api/logbooks/${existingRecordForSelectedDate.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // Create new record
+        res = await fetch("/api/logbooks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
 
       const json = await res.json();
       if (!res.ok || !json.success) {
@@ -184,7 +280,10 @@ export default function NewPersonalLogBookPage() {
         return;
       }
 
-      toast.success(json.message);
+      toast.success(json.message || "Catatan aktivitas berhasil disimpan!");
+      queryClient.invalidateQueries({ queryKey: ["all-logbooks-calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["logbooks"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
       router.push("/logbook");
       router.refresh();
     } catch (err: any) {
@@ -195,27 +294,63 @@ export default function NewPersonalLogBookPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-xl dark:border-slate-800">
-            <Link href="/logbook">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              Catat Log Book & Presensi Harian
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Pilih status kehadiran: Hadir Bekerja, Sakit, Izin / Cuti, atau Hari Libur.
-            </p>
-          </div>
+    <div className="max-w-4xl mx-auto space-y-6 pb-12">
+      {/* 1. Header Page Title (Kemnaker Style) */}
+      <div className="space-y-1">
+        <div className="text-[11px] font-bold tracking-wider text-blue-600 dark:text-blue-400 uppercase">
+          RIWAYAT
         </div>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+          Riwayat Kehadiran
+        </h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          Lihat catatan kehadiran dan laporan harian Anda.
+        </p>
       </div>
 
+      {/* 2. Monthly Attendance Calendar Picker (Referensikan Gambar Kedua) */}
+      <AttendanceCalendarPicker
+        selectedDate={selectedDate}
+        onSelectDate={handleDateSelect}
+        existingLogbooks={existingLogbooks}
+      />
+
+      {/* 3. Form Input Card (Terhubung langsung ke Tanggal Kalender) */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Form Title & Server Time Indicator */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+          <div>
+            <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+              {existingRecordForSelectedDate ? "UPDATE LAPORAN" : "TAMBAH LAPORAN"}
+            </div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4 text-blue-600" />
+              {formatDate(selectedDate)}
+            </h2>
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+            <Clock className="h-3.5 w-3.5 text-blue-600 animate-pulse" />
+            <span>Waktu Server: <strong className="font-mono text-blue-600 dark:text-blue-400">{serverTime || "10.43.44 WIB (GMT+7)"}</strong></span>
+          </div>
+        </div>
+
+        {existingRecordForSelectedDate && (
+          <div className="p-3.5 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/40 flex items-center justify-between text-xs text-blue-900 dark:text-blue-200">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0" />
+              <span>
+                Tanggal ini sudah memiliki catatan: <strong>&ldquo;{existingRecordForSelectedDate.title}&rdquo;</strong>. Anda dapat memperbarui form di bawah.
+              </span>
+            </div>
+            <Button asChild variant="ghost" size="sm" className="h-7 text-xs font-bold text-blue-700 dark:text-blue-300">
+              <Link href={`/logbook/${existingRecordForSelectedDate.id}`}>
+                <ExternalLink className="h-3 w-3 mr-1" /> Lihat Rincian
+              </Link>
+            </Button>
+          </div>
+        )}
+
         {/* Presensi / Kehadiran Selector Cards */}
         <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
           <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -314,16 +449,23 @@ export default function NewPersonalLogBookPage() {
         <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
           <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
             <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Tanggal & Detail Waktu
+              <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Detail Waktu & Klasifikasi
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Tanggal <span className="text-rose-500">*</span>
+                  Tanggal Terpilih <span className="text-rose-500">*</span>
                 </label>
-                <Input type="date" className="text-xs font-medium dark:bg-slate-950 dark:border-slate-800" {...register("activityDate")} />
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="date"
+                    className="text-xs font-semibold dark:bg-slate-950 dark:border-slate-800 bg-slate-50"
+                    value={selectedDate}
+                    onChange={(e) => handleDateSelect(e.target.value)}
+                  />
+                </div>
                 {errors.activityDate && (
                   <p className="text-xs text-rose-500 mt-1">{errors.activityDate.message}</p>
                 )}
@@ -355,7 +497,7 @@ export default function NewPersonalLogBookPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Kategori
+                  Kategori Aktivitas
                 </label>
                 <Select className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("categoryId")}>
                   <option value="">-- Pilih Kategori --</option>
@@ -372,7 +514,7 @@ export default function NewPersonalLogBookPage() {
                   Lokasi / Keterangan Tempat
                 </label>
                 <Input
-                  placeholder="Contoh: Kantor Pusat, Rumah, RS"
+                  placeholder="Contoh: Kantor / Meja Kerja"
                   className="text-xs dark:bg-slate-950 dark:border-slate-800"
                   {...register("location")}
                 />
@@ -446,7 +588,7 @@ export default function NewPersonalLogBookPage() {
                 placeholder={
                   isAbsent
                     ? "Contoh: Surat dokter telah diunggah / Izin disetujui pembimbing"
-                    : "Contoh: Berhasil deploy endpoint ke staging server dan lulus uji testing."
+                    : "Contoh: Berhasil menyelesaikan task dan commit kode ke repository."
                 }
                 className="text-xs dark:bg-slate-950 dark:border-slate-800"
                 {...register("outputResult")}
@@ -550,7 +692,7 @@ export default function NewPersonalLogBookPage() {
             ) : (
               <>
                 <Save className="h-3.5 w-3.5" />
-                <span>Simpan Catatan</span>
+                <span>{existingRecordForSelectedDate ? "Perbarui Catatan" : "Simpan Catatan"}</span>
               </>
             )}
           </Button>
