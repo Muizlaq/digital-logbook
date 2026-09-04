@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Calendar as CalendarIcon,
 } from "lucide-react";
 
 export interface AttendanceRecord {
@@ -245,7 +244,7 @@ export function AttendanceCalendarPicker({
         return <span className="h-2 w-2 bg-slate-800 dark:bg-slate-300 inline-block rounded-[1px]" />;
       }
       if (record.status === "DRAFT") {
-        return <span className="text-blue-500 text-[10px] leading-none">◆</span>;
+        return <span className="text-orange-500 text-[10px] leading-none">◆</span>;
       }
     }
 
@@ -257,7 +256,7 @@ export function AttendanceCalendarPicker({
     // If selected and no record
     if (isSelected) {
       return (
-        <span className="h-2.5 w-2.5 rounded-full border border-blue-600 dark:border-blue-400 inline-block" />
+        <span className="h-2.5 w-2.5 rounded-full border border-orange-500 dark:border-orange-400 inline-block" />
       );
     }
 
@@ -268,17 +267,17 @@ export function AttendanceCalendarPicker({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all">
+    <div className="glass-card rounded-3xl overflow-hidden shadow-xl transition-all">
       {/* 1. Header Navigation Bar (Kemnaker Period Header) */}
-      <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+      <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02]">
         <button
           type="button"
           onClick={handlePrevPeriod}
           disabled={currentPeriodIdx === 0}
-          className={`h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors shadow-2xs ${
+          className={`h-8 w-8 rounded-full border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-zinc-900 flex items-center justify-center text-slate-700 dark:text-zinc-300 transition-colors shadow-2xs ${
             currentPeriodIdx === 0
               ? "opacity-30 cursor-not-allowed"
-              : "hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              : "hover:bg-slate-100 dark:hover:bg-white/[0.08] cursor-pointer"
           }`}
           title="Periode Sebelumnya"
         >
@@ -286,10 +285,10 @@ export function AttendanceCalendarPicker({
         </button>
 
         <div className="text-center">
-          <div className="text-sm font-bold text-slate-900 dark:text-slate-100">
+          <div className="text-sm font-black text-slate-900 dark:text-white">
             {currentPeriod.title}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <div className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
             {currentPeriod.label}
           </div>
         </div>
@@ -298,10 +297,10 @@ export function AttendanceCalendarPicker({
           type="button"
           onClick={handleNextPeriod}
           disabled={currentPeriodIdx === INTERNSHIP_PERIODS.length - 1}
-          className={`h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors shadow-2xs ${
+          className={`h-8 w-8 rounded-full border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-zinc-900 flex items-center justify-center text-slate-700 dark:text-zinc-300 transition-colors shadow-2xs ${
             currentPeriodIdx === INTERNSHIP_PERIODS.length - 1
               ? "opacity-30 cursor-not-allowed"
-              : "hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              : "hover:bg-slate-100 dark:hover:bg-white/[0.08] cursor-pointer"
           }`}
           title="Periode Berikutnya"
         >
@@ -312,11 +311,11 @@ export function AttendanceCalendarPicker({
       {/* 2. Calendar Grid Table */}
       <div className="p-4 sm:p-6">
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 text-center pb-3 text-xs font-semibold text-slate-600 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+        <div className="grid grid-cols-7 text-center pb-3 text-xs font-bold text-slate-600 dark:text-zinc-400 border-b border-slate-100 dark:border-white/[0.08]">
           {DAYS_OF_WEEK.map((d) => (
             <div
               key={d.key}
-              className={d.isWeekend ? "text-rose-500 dark:text-rose-400" : "text-slate-700 dark:text-slate-300"}
+              className={d.isWeekend ? "text-rose-500 dark:text-rose-400" : "text-slate-700 dark:text-zinc-300"}
             >
               {d.label}
             </div>
@@ -330,8 +329,8 @@ export function AttendanceCalendarPicker({
               return (
                 <div
                   key={idx}
-                  className={`h-14 rounded-xl flex items-center justify-center ${
-                    cell.isWeekend ? "bg-slate-50/40 dark:bg-slate-950/20" : ""
+                  className={`h-14 rounded-2xl flex items-center justify-center ${
+                    cell.isWeekend ? "bg-slate-50/40 dark:bg-white/[0.01]" : ""
                   }`}
                 />
               );
@@ -346,26 +345,26 @@ export function AttendanceCalendarPicker({
                 key={idx}
                 onClick={() => onSelectDate(cell.dateStr)}
                 title={cell.isNationalHoliday ? `${cell.holidayName} (Libur Nasional)` : undefined}
-                className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all cursor-pointer relative group h-14 ${
+                className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all cursor-pointer relative group h-14 ${
                   cell.isNationalHoliday
                     ? "bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-900/40"
                     : cell.isWeekend
-                    ? "bg-slate-50/80 dark:bg-slate-950/50 border border-transparent"
-                    : "hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent"
+                    ? "bg-slate-50/80 dark:bg-white/[0.02] border border-transparent"
+                    : "hover:bg-slate-50 dark:hover:bg-white/[0.04] border border-transparent"
                 } ${
                   isSelected
-                    ? "border-2 border-blue-600 bg-blue-50/90 dark:bg-blue-950/70 shadow-xs z-10"
+                    ? "border-2 border-orange-500 bg-orange-50/90 dark:bg-orange-950/60 shadow-md shadow-orange-500/10 z-10"
                     : ""
                 }`}
               >
                 {/* Date Number */}
                 <div
-                  className={`text-xs font-semibold mb-1 flex items-center justify-center ${
+                  className={`text-xs font-bold mb-1 flex items-center justify-center ${
                     isSelected
-                      ? "bg-blue-600 text-white font-bold h-6 px-2 rounded-md shadow-xs"
+                      ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white h-6 px-2 rounded-lg shadow-sm"
                       : cell.isNationalHoliday || cell.isWeekend
                       ? "text-rose-600 dark:text-rose-400 font-bold"
-                      : "text-slate-800 dark:text-slate-200"
+                      : "text-slate-800 dark:text-zinc-200"
                   }`}
                 >
                   {cell.dayNumber}
@@ -378,7 +377,7 @@ export function AttendanceCalendarPicker({
 
                 {/* Small indicator if logbook exists */}
                 {hasLogbook && !isSelected && (
-                  <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-orange-500" />
                 )}
 
                 {/* Small red dot for national holiday */}
@@ -398,15 +397,15 @@ export function AttendanceCalendarPicker({
             <Sparkles className="h-3.5 w-3.5 text-rose-600" /> Libur Nasional Periode Ini:
           </span>
           {holidaysInPeriod.map((h) => (
-            <span key={h.dateStr} className="text-[11px] bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/50">
+            <span key={h.dateStr} className="text-[11px] bg-white dark:bg-zinc-900 px-2.5 py-0.5 rounded-full border border-rose-200 dark:border-rose-900/50 font-medium">
               <strong>{h.dayNumber} {new Intl.DateTimeFormat("id-ID", { month: "short" }).format(new Date(h.dateStr))}</strong>: {h.holidayName}
             </span>
           ))}
         </div>
       )}
 
-      {/* 4. Legend / Keterangan Status Presensi (Kemnaker Standard) */}
-      <div className="px-4 py-3.5 bg-slate-50/70 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-[11px] text-slate-700 dark:text-slate-300 font-medium">
+      {/* 4. Legend / Keterangan Status Presensi */}
+      <div className="px-4 py-3.5 bg-slate-50/70 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.08] flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-[11px] text-slate-700 dark:text-zinc-300 font-medium">
         <div className="flex items-center gap-1.5">
           <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">✓</span>
           <span>Disetujui</span>
@@ -428,7 +427,7 @@ export function AttendanceCalendarPicker({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-blue-500 text-[10px]">◆</span>
+          <span className="text-orange-500 text-[10px]">◆</span>
           <span>Menunggu Tindakan Mentor</span>
         </div>
 

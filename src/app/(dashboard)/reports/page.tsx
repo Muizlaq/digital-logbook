@@ -20,7 +20,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -215,7 +214,7 @@ export default function PersonalReportsPage() {
       startY: 30,
       theme: "grid",
       styles: { fontSize: 8, cellPadding: 2.5 },
-      headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: "bold" },
+      headStyles: { fillColor: [249, 115, 22], textColor: 255, fontStyle: "bold" },
     });
 
     doc.save(`LogBook_${(profile.name || "User").replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`);
@@ -223,36 +222,36 @@ export default function PersonalReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       {/* Header & Tab Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Laporan & Analitik Log Book
+          <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-orange-500" /> Laporan & Analitik Log Book
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
             Resume performa mingguan, visual diagram jam kerja, dan ekspor laporan berkala.
           </p>
         </div>
 
         {/* Tab Switcher: Resume Mingguan vs Rekapitulasi Lengkap */}
-        <div className="inline-flex rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1 shadow-xs self-start sm:self-auto">
+        <div className="inline-flex rounded-full border border-slate-200 dark:border-white/[0.08] bg-white/80 dark:bg-[#0c0d14]/90 p-1 shadow-sm backdrop-blur-md self-start sm:self-auto">
           <button
             onClick={() => setReportTab("weekly")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               reportTab === "weekly"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             <Sparkles className="h-3.5 w-3.5" /> Resume Mingguan
           </button>
           <button
             onClick={() => setReportTab("full")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               reportTab === "full"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             <TableIcon className="h-3.5 w-3.5" /> Rekapitulasi & Ekspor
@@ -276,24 +275,24 @@ export default function PersonalReportsPage() {
               variant="outline"
               size="sm"
               onClick={exportCSV}
-              className="text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:border-slate-800 rounded-xl"
+              className="text-xs rounded-full"
             >
-              <FileText className="h-4 w-4 mr-1.5 text-blue-600 dark:text-blue-400" /> CSV
+              <FileText className="h-4 w-4 mr-1.5 text-orange-500" /> CSV
             </Button>
 
             <Button
               variant="outline"
               size="sm"
               onClick={exportExcel}
-              className="text-xs text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-xl font-semibold"
+              className="text-xs text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-full font-bold"
             >
-              <FileSpreadsheet className="h-4 w-4 mr-1.5 text-emerald-600 dark:text-emerald-400" /> Export Excel
+              <FileSpreadsheet className="h-4 w-4 mr-1.5 text-emerald-500" /> Export Excel
             </Button>
 
             <Button
               size="sm"
               onClick={exportPDF}
-              className="text-xs bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold shadow-xs cursor-pointer"
+              className="text-xs bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white rounded-full font-bold shadow-md shadow-orange-500/25 px-4 cursor-pointer"
             >
               <Download className="h-4 w-4 mr-1.5" /> Export PDF
             </Button>
@@ -301,55 +300,47 @@ export default function PersonalReportsPage() {
 
           {/* Summary KPI Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-bold uppercase text-slate-400">Total Aktivitas</p>
-                  <div className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{summary.total}</div>
-                </div>
-                <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
-                  <Layers className="h-4 w-4" />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="glass-card rounded-3xl p-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Total Aktivitas</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{summary.total}</div>
+              </div>
+              <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                <Layers className="h-5 w-5" />
+              </div>
+            </div>
 
-            <Card className="border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/40 dark:bg-indigo-950/30 shadow-xs">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-bold uppercase text-indigo-700 dark:text-indigo-400">Total Waktu</p>
-                  <div className="text-xl font-bold text-indigo-900 dark:text-indigo-200 mt-0.5">{summary.totalHours} Jam</div>
-                </div>
-                <div className="p-2.5 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
-                  <Timer className="h-4 w-4" />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="glass-card rounded-3xl p-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Total Waktu</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{summary.totalHours} <span className="text-xs text-orange-500 font-bold">Jam</span></div>
+              </div>
+              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                <Timer className="h-5 w-5" />
+              </div>
+            </div>
 
-            <Card className="border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/30 shadow-xs">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-bold uppercase text-emerald-700 dark:text-emerald-400">Selesai</p>
-                  <div className="text-xl font-bold text-emerald-900 dark:text-emerald-200 mt-0.5">{summary.completed}</div>
-                </div>
-                <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
-                  <CheckCircle2 className="h-4 w-4" />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="glass-card rounded-3xl p-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Selesai</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{summary.completed}</div>
+              </div>
+              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+            </div>
 
-            <Card className="border-amber-200 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/30 shadow-xs">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-bold uppercase text-amber-700 dark:text-amber-400">In Progress / Draf</p>
-                  <div className="text-xl font-bold text-amber-900 dark:text-amber-200 mt-0.5">
-                    {(summary.inProgress || 0) + (summary.draft || 0)}
-                  </div>
+            <div className="glass-card rounded-3xl p-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">In Progress / Draf</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  {(summary.inProgress || 0) + (summary.draft || 0)}
                 </div>
-                <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300">
-                  <Clock className="h-4 w-4" />
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-500 border border-purple-500/20">
+                <Clock className="h-5 w-5" />
+              </div>
+            </div>
           </div>
 
           {/* Visual Charts */}
@@ -362,20 +353,20 @@ export default function PersonalReportsPage() {
           )}
 
           {/* Filter Parameters */}
-          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-              <CardTitle className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
-                <Filter className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" /> Filter Parameter Laporan
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-4">
+          <div className="glass-card rounded-3xl p-6 space-y-4">
+            <div className="border-b border-slate-100 dark:border-white/[0.08] pb-3 flex items-center justify-between">
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Filter className="h-3.5 w-3.5 text-orange-500" /> Filter Parameter Laporan
+              </h3>
+            </div>
+            <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="text-slate-500 dark:text-slate-400 font-medium">Periode Cepat:</span>
+                <span className="text-slate-500 dark:text-zinc-400 font-medium">Periode Cepat:</span>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPreset("today")}
-                  className="h-7 text-xs rounded-lg dark:border-slate-800"
+                  className="h-7 text-xs rounded-full"
                 >
                   Hari Ini
                 </Button>
@@ -383,7 +374,7 @@ export default function PersonalReportsPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setPreset("thisWeek")}
-                  className="h-7 text-xs rounded-lg dark:border-slate-800"
+                  className="h-7 text-xs rounded-full"
                 >
                   Minggu Ini
                 </Button>
@@ -391,7 +382,7 @@ export default function PersonalReportsPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setPreset("thisMonth")}
-                  className="h-7 text-xs rounded-lg dark:border-slate-800"
+                  className="h-7 text-xs rounded-full"
                 >
                   Bulan Ini
                 </Button>
@@ -399,7 +390,7 @@ export default function PersonalReportsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={resetFilters}
-                  className="h-7 text-xs text-rose-600 hover:text-rose-700"
+                  className="h-7 text-xs text-rose-500 hover:text-rose-600 rounded-full"
                 >
                   <RotateCcw className="h-3 w-3 mr-1" /> Reset Filter
                 </Button>
@@ -407,31 +398,31 @@ export default function PersonalReportsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Dari Tanggal</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-zinc-300 mb-1">Dari Tanggal</label>
                   <Input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="h-9 text-xs dark:bg-slate-950 dark:border-slate-800"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Sampai Tanggal</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-zinc-300 mb-1">Sampai Tanggal</label>
                   <Input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="h-9 text-xs dark:bg-slate-950 dark:border-slate-800"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Kategori</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-zinc-300 mb-1">Kategori</label>
                   <Select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="h-9 text-xs dark:bg-slate-950 dark:border-slate-800"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white"
                   >
                     <option value="ALL">Semua Kategori</option>
                     {categories.map((c: any) => (
@@ -443,11 +434,11 @@ export default function PersonalReportsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Status Aktivitas</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-zinc-300 mb-1">Status Aktivitas</label>
                   <Select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="h-9 text-xs dark:bg-slate-950 dark:border-slate-800"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white"
                   >
                     <option value="ALL">Semua Status</option>
                     <option value="COMPLETED">✅ Selesai</option>
@@ -456,14 +447,14 @@ export default function PersonalReportsPage() {
                   </Select>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Dataset Table */}
           {isLoading ? (
             <div className="space-y-2">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-14 w-full rounded-xl" />
+                <Skeleton key={i} className="h-14 w-full rounded-2xl" />
               ))}
             </div>
           ) : rows.length === 0 ? (
@@ -472,44 +463,44 @@ export default function PersonalReportsPage() {
               description="Sesuaikan filter rentang tanggal untuk melihat rekapitulasi kerja Anda."
             />
           ) : (
-            <div className="space-y-3">
-              <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <div className="glass-card rounded-3xl overflow-hidden shadow-xl space-y-0">
+              <div className="p-4 border-b border-slate-100 dark:border-white/[0.08] text-xs font-bold text-slate-700 dark:text-zinc-300">
                 Menampilkan {rows.length} entri aktivitas:
               </div>
-              <Table className="dark:border-slate-800">
-                <TableHeader className="dark:bg-slate-950/80">
-                  <TableRow className="dark:border-slate-800">
-                    <TableHead className="w-12">No</TableHead>
-                    <TableHead>Tanggal & Jam</TableHead>
-                    <TableHead>Kategori & Lokasi</TableHead>
-                    <TableHead>Judul Aktivitas & Output</TableHead>
-                    <TableHead>Status</TableHead>
+              <Table>
+                <TableHeader className="bg-slate-100/80 dark:bg-[#11131c]">
+                  <TableRow className="border-b border-slate-200/80 dark:border-white/[0.08]">
+                    <TableHead className="w-12 text-slate-700 dark:text-zinc-400 font-bold">No</TableHead>
+                    <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Tanggal & Jam</TableHead>
+                    <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Kategori & Lokasi</TableHead>
+                    <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Judul Aktivitas & Output</TableHead>
+                    <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {rows.map((row: any) => (
-                    <TableRow key={row.id} className="dark:border-slate-800/80 hover:dark:bg-slate-800/40">
-                      <TableCell className="font-medium text-xs text-slate-500 dark:text-slate-400">
+                    <TableRow key={row.id} className="border-b border-slate-100 dark:border-white/[0.05] hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors">
+                      <TableCell className="font-semibold text-xs text-slate-500 dark:text-zinc-400">
                         {row.no}
                       </TableCell>
                       <TableCell>
                         <div className="text-xs space-y-0.5">
-                          <div className="font-bold text-slate-900 dark:text-slate-100">{formatDate(row.activityDate)}</div>
-                          <div className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                          <div className="font-bold text-slate-900 dark:text-white">{formatDate(row.activityDate)}</div>
+                          <div className="font-mono text-slate-500 dark:text-zinc-400 text-[11px]">
                             {row.startTime} - {row.endTime} ({row.duration})
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-xs space-y-0.5">
-                          <div className="font-semibold text-slate-800 dark:text-slate-200">{row.category}</div>
-                          <div className="text-slate-400 text-[11px]">{row.location}</div>
+                          <div className="font-semibold text-slate-800 dark:text-zinc-200">{row.category}</div>
+                          <div className="text-slate-500 dark:text-zinc-400 text-[11px]">{row.location}</div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1 max-w-md">
-                          <div className="font-bold text-slate-900 dark:text-slate-100 text-xs line-clamp-1">{row.title}</div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Output: {row.outputResult}</div>
+                          <div className="font-bold text-slate-900 dark:text-white text-xs line-clamp-1">{row.title}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-zinc-400 line-clamp-1">Output: {row.outputResult}</div>
                         </div>
                       </TableCell>
                       <TableCell>

@@ -92,7 +92,7 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
 
   const categoryBreakdown = Object.keys(categoryCountMap).map((catName) => {
     const matchedCategory = categories.find((c) => c.name === catName);
-    const colorHex = matchedCategory?.colorHex || "#3b82f6";
+    const colorHex = matchedCategory?.colorHex || "#f97316";
     const hours = (categoryCountMap[catName].minutes / 60).toFixed(1);
     const percentage = summary.total > 0 ? Math.round((categoryCountMap[catName].count / summary.total) * 100) : 0;
 
@@ -108,24 +108,24 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* 1. Bar Chart: Jam Kerja Harian */}
-      <Card className="lg:col-span-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-        <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-row items-center justify-between">
+      <Card className="lg:col-span-2 border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+        <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10 flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-orange-500" />
               Grafik Durasi Jam Kerja Harian
             </CardTitle>
-            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+            <CardDescription className="text-xs text-slate-600 dark:text-zinc-400">
               Visualisasi diagram batang akumulasi jam kerja Anda per tanggal aktivitas
             </CardDescription>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-xl border border-blue-100 dark:border-blue-900/50">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-500/10 dark:bg-orange-500/20 px-3 py-1 rounded-xl border border-orange-500/20">
             <Clock className="h-3.5 w-3.5" /> Total: {summary.totalHours} Jam
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           {chartDays.length === 0 ? (
-            <div className="py-12 text-center text-xs text-slate-400">
+            <div className="py-12 text-center text-xs text-slate-400 dark:text-zinc-500">
               Belum ada data aktivitas untuk divisualisasikan.
             </div>
           ) : (
@@ -133,7 +133,7 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
               {/* Chart Visual with Y-Axis & Bars */}
               <div className="flex items-stretch gap-3">
                 {/* Y-Axis scale labels */}
-                <div className="flex flex-col justify-between text-[11px] font-mono text-slate-400 dark:text-slate-500 py-1 select-none pr-1">
+                <div className="flex flex-col justify-between text-[11px] font-mono text-slate-400 dark:text-zinc-500 py-1 select-none pr-1">
                   <span>{maxScale}j</span>
                   <span>{Math.round(maxScale * 0.66)}j</span>
                   <span>{Math.round(maxScale * 0.33)}j</span>
@@ -141,12 +141,12 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
                 </div>
 
                 {/* Bars Area */}
-                <div className="relative flex-1 flex items-end justify-around gap-4 sm:gap-8 h-48 border-b border-slate-200 dark:border-slate-800 pb-1">
+                <div className="relative flex-1 flex items-end justify-around gap-4 sm:gap-8 h-48 border-b border-slate-200 dark:border-white/10 pb-1">
                   {/* Grid Lines */}
                   <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-25">
-                    <div className="border-b border-dashed border-slate-300 dark:border-slate-700 w-full" />
-                    <div className="border-b border-dashed border-slate-300 dark:border-slate-700 w-full" />
-                    <div className="border-b border-dashed border-slate-300 dark:border-slate-700 w-full" />
+                    <div className="border-b border-dashed border-slate-300 dark:border-zinc-700 w-full" />
+                    <div className="border-b border-dashed border-slate-300 dark:border-zinc-700 w-full" />
+                    <div className="border-b border-dashed border-slate-300 dark:border-zinc-700 w-full" />
                     <div className="w-full" />
                   </div>
 
@@ -163,14 +163,14 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
                       >
                         {/* Tooltip on Hover */}
                         {isHovered && (
-                          <div className="absolute -top-12 z-30 whitespace-nowrap rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-3 py-1.5 text-xs font-bold shadow-xl shadow-black/30 animate-in fade-in zoom-in-95">
+                          <div className="absolute -top-12 z-30 whitespace-nowrap rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-3 py-1.5 text-xs font-bold shadow-xl shadow-black/30 animate-in fade-in zoom-in-95">
                             <div>{day.hours} Jam ({day.count} Aktivitas)</div>
                             <div className="text-[10px] opacity-75 font-normal">{day.formattedDate}</div>
                           </div>
                         )}
 
                         {/* Exact Value Tag on top of Bar */}
-                        <span className={`text-[11px] font-bold mb-1 transition-colors ${isHovered ? "text-blue-600 dark:text-blue-400 scale-105" : "text-slate-600 dark:text-slate-400"}`}>
+                        <span className={`text-[11px] font-bold mb-1 transition-colors ${isHovered ? "text-orange-600 dark:text-orange-400 scale-105" : "text-slate-700 dark:text-zinc-300"}`}>
                           {day.hours}j
                         </span>
 
@@ -178,18 +178,18 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
                         <div
                           className={`w-full rounded-t-xl transition-all duration-300 shadow-sm ${
                             isHovered
-                              ? "bg-gradient-to-t from-blue-700 via-indigo-600 to-blue-500 shadow-lg shadow-blue-500/30 scale-105"
-                              : "bg-gradient-to-t from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600"
+                              ? "bg-gradient-to-t from-orange-600 via-amber-500 to-orange-400 shadow-lg shadow-orange-500/30 scale-105"
+                              : "bg-gradient-to-t from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
                           }`}
                           style={{ height: `${barHeightPx}px` }}
                         />
 
                         {/* Day & Date Label */}
                         <div className="mt-2 text-center select-none">
-                          <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                          <span className="block text-xs font-bold text-slate-800 dark:text-zinc-200">
                             {day.dayName}
                           </span>
-                          <span className="block text-[10px] text-slate-400 font-mono">
+                          <span className="block text-[10px] text-slate-500 dark:text-zinc-400 font-mono">
                             {day.dateStr.slice(8, 10)}/{day.dateStr.slice(5, 7)}
                           </span>
                         </div>
@@ -200,12 +200,12 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
               </div>
 
               {/* Chart Legend & Average */}
-              <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex flex-wrap items-center justify-between text-xs text-slate-600 dark:text-zinc-400 pt-2 border-t border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-2 font-medium">
-                  <span className="h-3 w-3 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500" />
+                  <span className="h-3 w-3 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 shadow-xs" />
                   <span>Durasi Jam Kerja Harian</span>
                 </div>
-                <div className="font-semibold text-slate-700 dark:text-slate-300">
+                <div className="font-semibold text-slate-800 dark:text-zinc-200">
                   Rata-rata: {(parseFloat(summary.totalHours) / (chartDays.length || 1)).toFixed(1)} Jam / Hari Kerja
                 </div>
               </div>
@@ -215,19 +215,19 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
       </Card>
 
       {/* 2. Distribusi Kategori Pekerjaan */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-        <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-          <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <PieChart className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+      <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+        <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+          <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <PieChart className="h-4 w-4 text-orange-500" />
             Distribusi Kategori
           </CardTitle>
-          <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+          <CardDescription className="text-xs text-slate-600 dark:text-zinc-400">
             Perbandingan porsi aktivitas berdasarkan jenis pekerjaan
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 space-y-4">
           {categoryBreakdown.length === 0 ? (
-            <div className="py-8 text-center text-xs text-slate-400">
+            <div className="py-8 text-center text-xs text-slate-400 dark:text-zinc-500">
               Belum ada kategori yang tercatat.
             </div>
           ) : (
@@ -240,18 +240,18 @@ export function ReportCharts({ rows, summary, categories = [] }: ReportChartsPro
                         className="h-2.5 w-2.5 rounded-full shrink-0 shadow-xs"
                         style={{ backgroundColor: cat.colorHex }}
                       />
-                      <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                      <span className="font-semibold text-slate-800 dark:text-zinc-200 truncate">
                         {cat.name}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900 dark:text-slate-100">{cat.count} entri</span>
-                      <span className="text-[11px] text-slate-400">({cat.percentage}%)</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{cat.count} entri</span>
+                      <span className="text-[11px] text-slate-500 dark:text-zinc-400">({cat.percentage}%)</span>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="h-2.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                  <div className="h-2.5 w-full rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{

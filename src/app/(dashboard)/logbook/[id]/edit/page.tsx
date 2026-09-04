@@ -244,10 +244,10 @@ export default function EditPersonalLogBookPage({
 
       <form onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
         {/* Presensi / Kehadiran Selector Cards */}
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-          <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <CalendarCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Tipe Kehadiran / Status
+        <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+            <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <CalendarCheck className="h-4 w-4 text-orange-500" /> Tipe Kehadiran / Status
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
@@ -258,19 +258,19 @@ export default function EditPersonalLogBookPage({
                 onClick={() => handlePresenceChange("COMPLETED")}
                 className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                   currentStatus === "COMPLETED" || currentStatus === "IN_PROGRESS" || currentStatus === "DRAFT"
-                    ? "border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-950 dark:text-blue-200 ring-2 ring-blue-500/20 shadow-xs"
-                    : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    ? "border-orange-500 bg-orange-500/10 text-orange-950 dark:text-orange-200 ring-2 ring-orange-500/20 shadow-xs"
+                    : "border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <Briefcase className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <Briefcase className="h-5 w-5 text-orange-500" />
                   {(currentStatus === "COMPLETED" || currentStatus === "IN_PROGRESS" || currentStatus === "DRAFT") && (
-                    <span className="h-2 w-2 rounded-full bg-blue-600" />
+                    <span className="h-2 w-2 rounded-full bg-orange-500 shadow-xs shadow-orange-500/50" />
                   )}
                 </div>
                 <div>
-                  <div className="font-bold text-xs">Hadir Bekerja</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Aktivitas normal</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white">Hadir Bekerja</div>
+                  <div className="text-[11px] text-slate-500 dark:text-zinc-400">Aktivitas normal</div>
                 </div>
               </button>
 
@@ -281,7 +281,7 @@ export default function EditPersonalLogBookPage({
                 className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                   currentStatus === "SICK"
                     ? "border-rose-600 bg-rose-50/70 dark:bg-rose-950/40 text-rose-950 dark:text-rose-200 ring-2 ring-rose-500/20 shadow-xs"
-                    : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    : "border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -289,8 +289,8 @@ export default function EditPersonalLogBookPage({
                   {currentStatus === "SICK" && <span className="h-2 w-2 rounded-full bg-rose-600" />}
                 </div>
                 <div>
-                  <div className="font-bold text-xs">Sakit (Sick Leave)</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Surat dokter / rawat</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white">Sakit (Sick Leave)</div>
+                  <div className="text-[11px] text-slate-500 dark:text-zinc-400">Surat dokter / rawat</div>
                 </div>
               </button>
 
@@ -301,7 +301,7 @@ export default function EditPersonalLogBookPage({
                 className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                   currentStatus === "PERMISSION"
                     ? "border-amber-600 bg-amber-50/70 dark:bg-amber-950/40 text-amber-950 dark:text-amber-200 ring-2 ring-amber-500/20 shadow-xs"
-                    : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    : "border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -309,8 +309,8 @@ export default function EditPersonalLogBookPage({
                   {currentStatus === "PERMISSION" && <span className="h-2 w-2 rounded-full bg-amber-600" />}
                 </div>
                 <div>
-                  <div className="font-bold text-xs">Izin / Cuti</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Keperluan pribadi</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white">Izin / Cuti</div>
+                  <div className="text-[11px] text-slate-500 dark:text-zinc-400">Keperluan pribadi</div>
                 </div>
               </button>
 
@@ -321,7 +321,7 @@ export default function EditPersonalLogBookPage({
                 className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                   currentStatus === "HOLIDAY"
                     ? "border-purple-600 bg-purple-50/70 dark:bg-purple-950/40 text-purple-950 dark:text-purple-200 ring-2 ring-purple-500/20 shadow-xs"
-                    : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    : "border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -329,8 +329,8 @@ export default function EditPersonalLogBookPage({
                   {currentStatus === "HOLIDAY" && <span className="h-2 w-2 rounded-full bg-purple-600" />}
                 </div>
                 <div>
-                  <div className="font-bold text-xs">Libur / Cuti Bersama</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Hari libur resmi</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white">Libur / Cuti Bersama</div>
+                  <div className="text-[11px] text-slate-500 dark:text-zinc-400">Hari libur resmi</div>
                 </div>
               </button>
             </div>
@@ -338,53 +338,53 @@ export default function EditPersonalLogBookPage({
         </Card>
 
         {/* Section 1: Waktu & Klasifikasi */}
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-          <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Tanggal & Detail Waktu
+        <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+            <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Clock className="h-4 w-4 text-orange-500" /> Tanggal & Detail Waktu
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                   Tanggal Aktivitas <span className="text-rose-500">*</span>
                 </label>
-                <Input type="date" className="text-xs font-medium dark:bg-slate-950 dark:border-slate-800" {...register("activityDate")} />
+                <Input type="date" className="text-xs font-medium dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("activityDate")} />
                 {errors.activityDate && (
                   <p className="text-xs text-rose-500 mt-1">{errors.activityDate.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                   Waktu Mulai
                 </label>
-                <Input type="time" className="text-xs font-mono dark:bg-slate-950 dark:border-slate-800" {...register("startTime")} />
+                <Input type="time" className="text-xs font-mono dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("startTime")} />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                   Waktu Selesai
                 </label>
-                <Input type="time" className="text-xs font-mono dark:bg-slate-950 dark:border-slate-800" {...register("endTime")} />
+                <Input type="time" className="text-xs font-mono dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("endTime")} />
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg bg-blue-50/70 dark:bg-blue-950/40 p-3 text-xs text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
+            <div className="flex items-center justify-between rounded-xl bg-orange-500/10 dark:bg-orange-500/20 p-3.5 text-xs text-orange-950 dark:text-orange-200 border border-orange-500/20">
               <div className="flex items-center gap-2">
-                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <Info className="h-4 w-4 text-orange-500" />
                 <span>Durasi Kerja Terhitung:</span>
               </div>
-              <span className="font-bold text-blue-900 dark:text-blue-200">{durationText}</span>
+              <span className="font-bold text-orange-950 dark:text-white font-mono">{durationText}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                   Kategori
                 </label>
-                <Select className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("categoryId")}>
+                <Select className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("categoryId")}>
                   <option value="">-- Pilih Kategori --</option>
                   {masterData?.categories?.map((c: any) => (
                     <option key={c.id} value={c.id}>
@@ -395,17 +395,17 @@ export default function EditPersonalLogBookPage({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                   Lokasi / Keterangan Tempat
                 </label>
-                <Input className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("location")} />
+                <Input className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("location")} />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                   Status Catatan
                 </label>
-                <Select className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("status")}>
+                <Select className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("status")}>
                   <option value="COMPLETED">✅ Hadir - Selesai</option>
                   <option value="IN_PROGRESS">⚡ Hadir - Sedang Berjalan</option>
                   <option value="DRAFT">📝 Draf / Rencana</option>
@@ -419,55 +419,55 @@ export default function EditPersonalLogBookPage({
         </Card>
 
         {/* Section 2: Rincian Aktivitas */}
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-          <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <FileCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+            <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <FileCheck className="h-4 w-4 text-orange-500" />
               {isAbsent ? "Keterangan Alasan Izin / Sakit" : "Rincian Aktivitas & Hasil"}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 {isAbsent ? "Judul Keterangan" : "Judul Aktivitas"} <span className="text-rose-500">*</span>
               </label>
-              <Input className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("title")} />
+              <Input className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("title")} />
               {errors.title && (
                 <p className="text-xs text-rose-500 mt-1">{errors.title.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 {isAbsent ? "Penjelasan Alasan Lengkap" : "Deskripsi Lengkap Aktivitas"} <span className="text-rose-500">*</span>
               </label>
-              <Textarea rows={4} className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("description")} />
+              <Textarea rows={4} className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("description")} />
               {errors.description && (
                 <p className="text-xs text-rose-500 mt-1">{errors.description.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 {isAbsent ? "Output / Status Persetujuan (Opsional)" : "Output / Hasil Capaian"}
               </label>
-              <Textarea rows={3} className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("outputResult")} />
+              <Textarea rows={3} className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("outputResult")} />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Catatan Tambahan & Kendala
               </label>
-              <Textarea rows={2} className="text-xs dark:bg-slate-950 dark:border-slate-800" {...register("notes")} />
+              <Textarea rows={2} className="text-xs dark:bg-zinc-900 dark:border-white/10 border-slate-200" {...register("notes")} />
             </div>
           </CardContent>
         </Card>
 
         {/* Section 3: Lampiran Bukti File */}
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-          <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Paperclip className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+            <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Paperclip className="h-4 w-4 text-orange-500" />
               {currentStatus === "SICK"
                 ? "Lampiran Surat Keterangan Dokter"
                 : currentStatus === "PERMISSION"
@@ -477,7 +477,7 @@ export default function EditPersonalLogBookPage({
           </CardHeader>
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <label className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors">
+              <label className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 hover:bg-orange-500/20 dark:hover:bg-orange-500/30 px-4 py-2 text-xs font-semibold text-orange-700 dark:text-orange-300 border border-orange-500/20 transition-colors">
                 <Paperclip className="h-4 w-4" />
                 <span>{uploading ? "Mengunggah..." : "Tambah Berkas Lampiran"}</span>
                 <input
@@ -489,7 +489,7 @@ export default function EditPersonalLogBookPage({
                   accept=".jpg,.jpeg,.png,.webp,.pdf,.docx,.xlsx,.zip"
                 />
               </label>
-              {uploading && <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />}
+              {uploading && <Loader2 className="h-4 w-4 animate-spin text-orange-500" />}
             </div>
 
             {attachments.length > 0 && (
@@ -497,11 +497,11 @@ export default function EditPersonalLogBookPage({
                 {attachments.map((att) => (
                   <div
                     key={att.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] text-xs"
                   >
                     <div className="flex items-center gap-2 truncate">
-                      <Paperclip className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                      <span className="font-medium text-slate-800 dark:text-slate-200 truncate">{att.fileName}</span>
+                      <Paperclip className="h-3.5 w-3.5 text-orange-500 shrink-0" />
+                      <span className="font-medium text-slate-800 dark:text-zinc-200 truncate">{att.fileName}</span>
                     </div>
                     <button
                       type="button"
@@ -519,14 +519,14 @@ export default function EditPersonalLogBookPage({
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" asChild className="rounded-xl text-xs dark:border-slate-800">
+          <Button type="button" variant="outline" asChild className="rounded-xl text-xs dark:border-white/10">
             <Link href={`/logbook/${id}`}>Batal</Link>
           </Button>
 
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 gap-1.5 cursor-pointer"
+            className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-orange-500/25 gap-1.5 cursor-pointer hover:opacity-95"
           >
             {submitting ? (
               <>

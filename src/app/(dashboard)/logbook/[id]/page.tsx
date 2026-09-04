@@ -165,15 +165,15 @@ export default function PersonalLogBookDetailPage({
           )}
 
           {/* Lampiran Bukti File */}
-          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-              <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <Paperclip className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Berkas Lampiran Bukti
+          <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+            <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+              <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Paperclip className="h-4 w-4 text-orange-500" /> Berkas Lampiran Bukti
               </CardTitle>
             </CardHeader>
             <CardContent className="p-5">
               {!data.attachments || data.attachments.length === 0 ? (
-                <div className="text-xs text-slate-400 py-2">
+                <div className="text-xs text-slate-500 dark:text-zinc-500 py-2">
                   Tidak ada berkas lampiran yang diunggah.
                 </div>
               ) : (
@@ -181,17 +181,17 @@ export default function PersonalLogBookDetailPage({
                   {data.attachments.map((att: any) => (
                     <div
                       key={att.id}
-                      className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                      className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                     >
                       <div className="flex items-center gap-2.5 truncate">
-                        <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
+                        <div className="p-2 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
                           <FileText className="h-4 w-4" />
                         </div>
                         <div className="truncate">
-                          <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+                          <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                             {att.fileName}
                           </p>
-                          <span className="text-[10px] text-slate-400">
+                          <span className="text-[10px] text-slate-500 dark:text-zinc-400">
                             {(att.fileSize / 1024).toFixed(1)} KB
                           </span>
                         </div>
@@ -200,7 +200,7 @@ export default function PersonalLogBookDetailPage({
                         href={att.filePath}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors"
+                        className="p-1.5 text-slate-500 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-400 rounded-lg hover:bg-slate-200/50 dark:hover:bg-white/10 transition-colors"
                         title="Buka Berkas"
                       >
                         <Download className="h-4 w-4" />
@@ -215,49 +215,49 @@ export default function PersonalLogBookDetailPage({
 
         {/* Right Column: Metadata Sidebar */}
         <div className="space-y-6">
-          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-              <CardTitle className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+          <Card className="border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-xs">
+            <CardHeader className="pb-3 border-b border-slate-100 dark:border-white/10">
+              <CardTitle className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
                 Informasi Pelaksanaan
               </CardTitle>
             </CardHeader>
             <CardContent className="p-5 space-y-4 text-xs">
               <div>
-                <span className="text-slate-400 block mb-1">Tanggal Aktivitas</span>
-                <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-slate-500 dark:text-zinc-400 block mb-1">Tanggal Aktivitas</span>
+                <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5 text-orange-500" />
                   {formatDate(data.activityDate)}
                 </div>
               </div>
 
               <div>
-                <span className="text-slate-400 block mb-1">Waktu Pengerjaan</span>
-                <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 font-mono">
-                  <Clock className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-slate-500 dark:text-zinc-400 block mb-1">Waktu Pengerjaan</span>
+                <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5 font-mono">
+                  <Clock className="h-3.5 w-3.5 text-orange-500" />
                   {formatTime(data.startTime)} - {formatTime(data.endTime)}
                 </div>
               </div>
 
               <div>
-                <span className="text-slate-400 block mb-1">Kategori Aktivitas</span>
-                <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <span className="text-slate-500 dark:text-zinc-400 block mb-1">Kategori Aktivitas</span>
+                <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
                   <span
                     className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: data.category?.colorHex || "#3b82f6" }}
+                    style={{ backgroundColor: data.category?.colorHex || "#f97316" }}
                   />
                   {data.category?.name || "Umum"}
                 </div>
               </div>
 
               <div>
-                <span className="text-slate-400 block mb-1">Lokasi / Tempat</span>
-                <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-slate-500 dark:text-zinc-400 block mb-1">Lokasi / Tempat</span>
+                <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-orange-500" />
                   {data.location || "-"}
                 </div>
               </div>
 
-              <div className="pt-2 text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800">
+              <div className="pt-2 text-[11px] text-slate-500 dark:text-zinc-400 border-t border-slate-100 dark:border-white/10">
                 Dicatat pada: {formatDateTime(data.createdAt)}
               </div>
             </CardContent>

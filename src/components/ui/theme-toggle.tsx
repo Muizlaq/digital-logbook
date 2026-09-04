@@ -41,11 +41,11 @@ export function ThemeToggle() {
           title="Ubah Tema (Terang / Gelap)"
         >
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
-          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-amber-400" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900">
+      <DropdownMenuContent align="end" className="w-36 rounded-xl border-slate-200 dark:border-white/10 dark:bg-zinc-950">
         <DropdownMenuItem
           onClick={() => setTheme("light")}
           className="cursor-pointer gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200"
@@ -57,7 +57,7 @@ export function ThemeToggle() {
           onClick={() => setTheme("dark")}
           className="cursor-pointer gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200"
         >
-          <Moon className="h-4 w-4 text-blue-400" />
+          <Moon className="h-4 w-4 text-amber-400" />
           <span>Tema Gelap</span>
         </DropdownMenuItem>
         <DropdownMenuItem

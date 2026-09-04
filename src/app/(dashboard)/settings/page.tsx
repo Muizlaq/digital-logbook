@@ -19,7 +19,6 @@ import {
 import { categorySchema, userProfileSchema, CategoryInput, UserProfileInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Dialog,
@@ -32,12 +31,12 @@ import {
 import { toast } from "sonner";
 
 const PRESET_COLORS = [
-  "#3b82f6", // Blue
-  "#10b981", // Emerald
+  "#f97316", // Orange
   "#f59e0b", // Amber
+  "#10b981", // Emerald
+  "#06b6d4", // Cyan
   "#8b5cf6", // Purple
   "#ec4899", // Pink
-  "#06b6d4", // Cyan
   "#ef4444", // Red
   "#64748b", // Slate
 ];
@@ -95,18 +94,18 @@ export default function PersonalSettingsPage() {
     defaultValues: {
       name: "",
       description: "",
-      colorHex: "#3b82f6",
+      colorHex: "#f97316",
     },
   });
 
-  const selectedColor = watchCategory("colorHex") || "#3b82f6";
+  const selectedColor = watchCategory("colorHex") || "#f97316";
 
   const openAddCategoryModal = () => {
     setEditingCategory(null);
     resetCategory({
       name: "",
       description: "",
-      colorHex: "#3b82f6",
+      colorHex: "#f97316",
     });
     setIsCategoryModalOpen(true);
   };
@@ -116,7 +115,7 @@ export default function PersonalSettingsPage() {
     resetCategory({
       name: cat.name,
       description: cat.description || "",
-      colorHex: cat.colorHex || "#3b82f6",
+      colorHex: cat.colorHex || "#f97316",
     });
     setIsCategoryModalOpen(true);
   };
@@ -192,58 +191,59 @@ export default function PersonalSettingsPage() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 pb-10">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
-          <Settings className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Kategori & Pengaturan Profil
+        <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+          <Settings className="h-5 w-5 text-orange-500" /> Kategori & Pengaturan Profil
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
           Atur informasi profil pribadi, target jam kerja harian, dan kelola kategori pekerjaan Anda.
         </p>
       </div>
 
       {/* Category Section */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-        <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="glass-card rounded-3xl overflow-hidden shadow-xl">
+        <div className="p-6 border-b border-slate-100 dark:border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Layers className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Kategori Aktivitas Pekerjaan
-            </CardTitle>
-            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <Layers className="h-4 w-4 text-orange-500" /> Kategori Aktivitas Pekerjaan
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 font-normal">
               Kategori yang tersedia saat Anda mencatat dan memfilter log book aktivitas.
-            </CardDescription>
+            </p>
           </div>
           <Button
             size="sm"
             onClick={openAddCategoryModal}
-            className="rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer"
+            className="rounded-full text-xs font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white shadow-md shadow-orange-500/25 cursor-pointer px-4"
           >
             <PlusCircle className="h-4 w-4 mr-1.5" /> Tambah Kategori
           </Button>
-        </CardHeader>
-        <CardContent className="p-0">
+        </div>
+
+        <div className="p-0">
           {categories.length === 0 ? (
             <div className="p-8 text-center text-xs text-slate-400">
               Belum ada kategori. Klik tombol &quot;Tambah Kategori&quot; untuk membuat kategori baru.
             </div>
           ) : (
-            <Table className="dark:border-slate-800">
-              <TableHeader className="dark:bg-slate-950/80">
-                <TableRow className="dark:border-slate-800">
-                  <TableHead className="w-12">No</TableHead>
-                  <TableHead>Nama Kategori</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead>Warna Label</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+            <Table>
+              <TableHeader className="bg-slate-100/80 dark:bg-[#11131c]">
+                <TableRow className="border-b border-slate-200/80 dark:border-white/[0.08]">
+                  <TableHead className="w-12 text-slate-700 dark:text-zinc-400 font-bold">No</TableHead>
+                  <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Nama Kategori</TableHead>
+                  <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Deskripsi</TableHead>
+                  <TableHead className="text-slate-700 dark:text-zinc-400 font-bold">Warna Label</TableHead>
+                  <TableHead className="text-right text-slate-700 dark:text-zinc-400 font-bold">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {categories.map((c: any, idx: number) => (
-                  <TableRow key={c.id} className="dark:border-slate-800/80 hover:dark:bg-slate-800/40">
-                    <TableCell className="text-xs text-slate-500 dark:text-slate-400 font-medium">{idx + 1}</TableCell>
+                  <TableRow key={c.id} className="border-b border-slate-100 dark:border-white/[0.05] hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors">
+                    <TableCell className="text-xs text-slate-500 dark:text-zinc-400 font-semibold">{idx + 1}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs">
+                      <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-xs">
                         <span
                           className="h-3 w-3 rounded-full shrink-0 shadow-xs"
                           style={{ backgroundColor: c.colorHex }}
@@ -251,16 +251,16 @@ export default function PersonalSettingsPage() {
                         {c.name}
                       </div>
                     </TableCell>
-                    <TableCell className="text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate">
+                    <TableCell className="text-xs text-slate-600 dark:text-zinc-300 max-w-xs truncate">
                       {c.description || "-"}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <span
-                          className="h-3.5 w-3.5 rounded border border-slate-300 dark:border-slate-700"
+                          className="h-3.5 w-3.5 rounded border border-slate-300 dark:border-zinc-700"
                           style={{ backgroundColor: c.colorHex }}
                         />
-                        <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200">
                           {c.colorHex}
                         </span>
                       </div>
@@ -271,7 +271,7 @@ export default function PersonalSettingsPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEditCategoryModal(c)}
-                          className="h-8 w-8 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400"
+                          className="h-8 w-8 text-slate-600 dark:text-zinc-400 hover:text-orange-500 rounded-lg"
                           title="Ubah Kategori"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
@@ -280,7 +280,7 @@ export default function PersonalSettingsPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => deleteCategoryMutation.mutate(c.id)}
-                          className="h-8 w-8 text-slate-400 hover:text-rose-600"
+                          className="h-8 w-8 text-slate-400 hover:text-rose-500 rounded-lg"
                           title="Hapus Kategori"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -292,120 +292,119 @@ export default function PersonalSettingsPage() {
               </TableBody>
             </Table>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Profile Section */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-        <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-          <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <User className="h-4 w-4 text-blue-600 dark:text-blue-400" /> Informasi Profil & Target Jam Kerja
-          </CardTitle>
-          <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+      <div className="glass-card rounded-3xl p-6 shadow-xl space-y-5">
+        <div className="border-b border-slate-100 dark:border-white/[0.08] pb-4">
+          <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <User className="h-4 w-4 text-orange-500" /> Informasi Profil & Target Jam Kerja
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 font-normal mt-0.5">
             Nama dan profesi akan otomatis tercantum pada kop laporan PDF, serta target jam kerja untuk indikator progress ring di dashboard.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <form
-            onSubmit={handleProfileSubmit((data) => updateProfileMutation.mutate(data))}
-            className="space-y-4 text-xs"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Nama Lengkap <span className="text-rose-500">*</span>
-                </label>
-                <Input className="text-xs dark:bg-slate-950 dark:border-slate-800" {...registerProfile("name")} />
-                {profileErrors.name && (
-                  <p className="text-xs text-rose-500 mt-1">{profileErrors.name.message}</p>
-                )}
-              </div>
+          </p>
+        </div>
 
-              <div>
-                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Email
-                </label>
-                <Input type="email" className="text-xs dark:bg-slate-950 dark:border-slate-800" {...registerProfile("email")} />
-                {profileErrors.email && (
-                  <p className="text-xs text-rose-500 mt-1">{profileErrors.email.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Profesi / Jabatan / Posisi
-                </label>
-                <Input
-                  placeholder="Contoh: Senior Frontend Engineer / Konsultan"
-                  className="text-xs dark:bg-slate-950 dark:border-slate-800"
-                  {...registerProfile("jobTitle")}
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                  <Target className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                  Target Jam Kerja Harian (Jam) <span className="text-rose-500">*</span>
-                </label>
-                <Input
-                  type="number"
-                  step="0.5"
-                  min="1"
-                  max="24"
-                  placeholder="8"
-                  className="text-xs dark:bg-slate-950 dark:border-slate-800 font-bold"
-                  {...registerProfile("dailyTargetHours")}
-                />
-                {profileErrors.dailyTargetHours && (
-                  <p className="text-xs text-rose-500 mt-1">{profileErrors.dailyTargetHours.message}</p>
-                )}
-              </div>
+        <form
+          onSubmit={handleProfileSubmit((data) => updateProfileMutation.mutate(data))}
+          className="space-y-4 text-xs"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+                Nama Lengkap <span className="text-rose-500">*</span>
+              </label>
+              <Input className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white font-medium" {...registerProfile("name")} />
+              {profileErrors.name && (
+                <p className="text-xs text-rose-500 mt-1">{profileErrors.name.message}</p>
+              )}
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Catatan Singkat / Bio
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+                Email
+              </label>
+              <Input type="email" className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white font-medium" {...registerProfile("email")} />
+              {profileErrors.email && (
+                <p className="text-xs text-rose-500 mt-1">{profileErrors.email.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+                Profesi / Jabatan / Posisi
               </label>
               <Input
-                placeholder="Motto kerja atau fokus keahlian..."
-                className="text-xs dark:bg-slate-950 dark:border-slate-800"
-                {...registerProfile("bio")}
+                placeholder="Contoh: Senior Frontend Engineer / Konsultan"
+                className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white font-medium"
+                {...registerProfile("jobTitle")}
               />
             </div>
 
-            <div className="flex justify-end pt-2">
-              <Button
-                type="submit"
-                size="sm"
-                disabled={updateProfileMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs gap-1.5 shadow-xs cursor-pointer"
-              >
-                {updateProfileMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Menyimpan...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-3.5 w-3.5" /> Simpan Profil
-                  </>
-                )}
-              </Button>
+            <div>
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                <Target className="h-3.5 w-3.5 text-orange-500" />
+                Target Jam Kerja Harian (Jam) <span className="text-rose-500">*</span>
+              </label>
+              <Input
+                type="number"
+                step="0.5"
+                min="1"
+                max="24"
+                placeholder="8"
+                className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white font-bold"
+                {...registerProfile("dailyTargetHours")}
+              />
+              {profileErrors.dailyTargetHours && (
+                <p className="text-xs text-rose-500 mt-1">{profileErrors.dailyTargetHours.message}</p>
+              )}
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+
+          <div>
+            <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">
+              Catatan Singkat / Bio
+            </label>
+            <Input
+              placeholder="Motto kerja atau fokus keahlian..."
+              className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white font-medium"
+              {...registerProfile("bio")}
+            />
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button
+              type="submit"
+              size="sm"
+              disabled={updateProfileMutation.isPending}
+              className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-full text-xs gap-1.5 shadow-lg shadow-orange-500/25 px-6 cursor-pointer"
+            >
+              {updateProfileMutation.isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Menyimpan...
+                </>
+              ) : (
+                <>
+                  <Save className="h-3.5 w-3.5" /> Simpan Profil
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
 
       {/* Add / Edit Category Modal */}
       <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white dark:bg-[#0c0d14] border-slate-200 dark:border-white/[0.08] rounded-3xl">
           <DialogHeader>
-            <DialogTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Palette className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <DialogTitle className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <Palette className="h-4 w-4 text-orange-500" />
               {editingCategory ? "Ubah Data Kategori" : "Tambah Kategori Aktivitas Baru"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+            <DialogDescription className="text-xs text-slate-500 dark:text-zinc-400">
               {editingCategory
                 ? "Perbarui nama, deskripsi, atau warna label kategori yang dipilih."
                 : "Buat kategori kustom untuk mengelompokkan aktivitas harian Anda."}
@@ -417,12 +416,12 @@ export default function PersonalSettingsPage() {
             className="space-y-4 py-2 text-xs"
           >
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Nama Kategori <span className="text-rose-500">*</span>
               </label>
               <Input
                 placeholder="Contoh: Riset AI, Desain UI/UX, Maintenance"
-                className="text-xs dark:bg-slate-950 dark:border-slate-800"
+                className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white"
                 {...registerCategory("name")}
               />
               {categoryErrors.name && (
@@ -431,18 +430,18 @@ export default function PersonalSettingsPage() {
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Deskripsi Singkat (Opsional)
               </label>
               <Input
                 placeholder="Penjelasan ringkas kategori..."
-                className="text-xs dark:bg-slate-950 dark:border-slate-800"
+                className="text-xs rounded-xl bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white"
                 {...registerCategory("description")}
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block font-semibold text-slate-700 dark:text-zinc-300 mb-1.5">
                 Pilih Warna Label Kategori
               </label>
 
@@ -455,7 +454,7 @@ export default function PersonalSettingsPage() {
                     onClick={() => setCategoryValue("colorHex", color)}
                     className={`h-6 w-6 rounded-full cursor-pointer transition-transform hover:scale-110 ${
                       selectedColor.toLowerCase() === color.toLowerCase()
-                        ? "ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 scale-110"
+                        ? "ring-2 ring-orange-500 ring-offset-2 dark:ring-offset-[#0c0d14] scale-110"
                         : "opacity-80 hover:opacity-100"
                     }`}
                     style={{ backgroundColor: color }}
@@ -468,11 +467,11 @@ export default function PersonalSettingsPage() {
               <div className="flex items-center gap-3">
                 <input
                   type="color"
-                  className="h-9 w-12 rounded cursor-pointer border border-slate-200 dark:border-slate-800 p-0.5 bg-transparent"
+                  className="h-9 w-12 rounded-lg cursor-pointer border border-slate-200 dark:border-white/[0.1] p-0.5 bg-transparent"
                   {...registerCategory("colorHex")}
                 />
                 <Input
-                  className="h-8 w-28 font-mono text-xs uppercase dark:bg-slate-950 dark:border-slate-800"
+                  className="h-8 w-28 font-mono text-xs uppercase rounded-lg bg-slate-50 dark:bg-[#12141c] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white font-bold"
                   {...registerCategory("colorHex")}
                 />
                 <span className="text-slate-400 text-[11px]">
@@ -487,7 +486,7 @@ export default function PersonalSettingsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsCategoryModalOpen(false)}
-                className="dark:border-slate-800"
+                className="rounded-full"
               >
                 Batal
               </Button>
@@ -495,7 +494,7 @@ export default function PersonalSettingsPage() {
                 type="submit"
                 size="sm"
                 disabled={saveCategoryMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold cursor-pointer"
+                className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-full px-5 cursor-pointer"
               >
                 {saveCategoryMutation.isPending ? (
                   <>
