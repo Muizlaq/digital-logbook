@@ -143,13 +143,12 @@ export default function DashboardPage() {
             <div className="relative flex items-center justify-center shrink-0">
               {/* Outer Glow Halo */}
               <div
-                className={`absolute w-24 h-24 rounded-full blur-xl transition-all duration-700 ${
-                  isGoalReached
+                className={`absolute w-24 h-24 rounded-full blur-xl transition-all duration-700 ${isGoalReached
                     ? "bg-emerald-500/30"
                     : todayProgress.hours > 0
-                    ? "bg-blue-500/30"
-                    : "bg-slate-400/10"
-                }`}
+                      ? "bg-blue-500/30"
+                      : "bg-slate-400/10"
+                  }`}
               />
 
               <svg className="w-32 h-32 transform -rotate-90">
@@ -210,8 +209,8 @@ export default function DashboardPage() {
                   {isGoalReached
                     ? "Target harian telah terpenuhi dengan sempurna hari ini!"
                     : todayProgress.hours > 0
-                    ? `Kurang ${todayProgress.remainingHours} jam lagi untuk mencapai target.`
-                    : "Belum ada aktivitas dicatat hari ini. Yuk mulai!"}
+                      ? `Kurang ${todayProgress.remainingHours} jam lagi untuk mencapai target.`
+                      : "Belum ada aktivitas dicatat hari ini. Yuk mulai!"}
                 </p>
               </div>
 
