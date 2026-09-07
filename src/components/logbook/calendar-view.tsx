@@ -22,7 +22,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatTime, toLocalDateString } from "@/lib/utils";
 
 interface CalendarViewProps {
   logbooks: any[];
@@ -32,6 +32,7 @@ interface CalendarViewProps {
 const DAYS_OF_WEEK = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 export function CalendarView({ logbooks = [], categories = [] }: CalendarViewProps) {
+  // Current viewing month and year (0-indexed month)
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDateEvents, setSelectedDateEvents] = useState<{
     dateStr: string;
@@ -41,7 +42,7 @@ export function CalendarView({ logbooks = [], categories = [] }: CalendarViewPro
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // Navigation handlers
+  // Month navigation
   const prevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
@@ -54,31 +55,28 @@ export function CalendarView({ logbooks = [], categories = [] }: CalendarViewPro
     setCurrentDate(new Date());
   };
 
-  // Month Title format in Indonesian
+  // Format month and year title
   const monthTitle = new Intl.DateTimeFormat("id-ID", {
     month: "long",
     year: "numeric",
   }).format(currentDate);
 
-  // Calculate calendar grid dates
-  const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
+  // Compute calendar grid days
+  // Day of week for 1st of month: 0 (Sun) to 6 (Sat)
+  // We want Monday as index 0, Sunday as index 6
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const firstDayIndex = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
-  // Day of week for 1st day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-  let firstDayIndex = firstDayOfMonth.getDay() - 1;
-  if (firstDayIndex === -1) firstDayIndex = 6; // Sunday becomes index 6
-
-  const daysInMonth = lastDayOfMonth.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-  // Build cells array
   const calendarCells = [];
 
   // 1. Previous month trailing days
   for (let i = firstDayIndex - 1; i >= 0; i--) {
     const d = daysInPrevMonth - i;
     const dateObj = new Date(year, month - 1, d);
-    const dateStr = dateObj.toISOString().slice(0, 10);
+    const dateStr = toLocalDateString(dateObj);
     calendarCells.push({
       dayNumber: d,
       dateStr,
@@ -89,7 +87,7 @@ export function CalendarView({ logbooks = [], categories = [] }: CalendarViewPro
   // 2. Current month days
   for (let d = 1; d <= daysInMonth; d++) {
     const dateObj = new Date(year, month, d);
-    const dateStr = dateObj.toISOString().slice(0, 10);
+    const dateStr = toLocalDateString(dateObj);
     calendarCells.push({
       dayNumber: d,
       dateStr,
@@ -101,7 +99,7 @@ export function CalendarView({ logbooks = [], categories = [] }: CalendarViewPro
   const remainingCells = (7 - (calendarCells.length % 7)) % 7;
   for (let d = 1; d <= remainingCells; d++) {
     const dateObj = new Date(year, month + 1, d);
-    const dateStr = dateObj.toISOString().slice(0, 10);
+    const dateStr = toLocalDateString(dateObj);
     calendarCells.push({
       dayNumber: d,
       dateStr,
@@ -109,7 +107,7 @@ export function CalendarView({ logbooks = [], categories = [] }: CalendarViewPro
     });
   }
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = toLocalDateString(new Date());
 
   // Helper to get activities on date
   const getActivitiesForDate = (dateStr: string) => {

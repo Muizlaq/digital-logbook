@@ -8,100 +8,107 @@ export interface UserProfileModel {
   bio?: string | null;
 }
 
-export interface ActivityCategoryModel {
+import { toLocalDateString } from "@/lib/utils";
+
+export interface Category {
   id: string;
   name: string;
-  description?: string | null;
+  description?: string;
   colorHex: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface LogBookAttachmentModel {
+export interface Attachment {
   id: string;
   logBookId: string;
   fileName: string;
   filePath: string;
   fileSize: number;
-  fileType: string;
+  mimeType: string;
   createdAt: string;
 }
 
-export interface LogBookModel {
+export interface LogBook {
   id: string;
-  categoryId?: string | null;
-  activityDate: string; // YYYY-MM-DD
-  startTime: string;    // HH:mm
-  endTime: string;      // HH:mm
+  categoryId: string;
+  activityDate: string;
+  startTime: string;
+  endTime: string;
   location: string;
   title: string;
   description: string;
   outputResult: string;
-  notes?: string | null;
-  status: "COMPLETED" | "IN_PROGRESS" | "DRAFT" | "SICK" | "PERMISSION" | "HOLIDAY";
+  notes?: string;
+  status: "DRAFT" | "IN_PROGRESS" | "COMPLETED" | "SICK" | "PERMISSION" | "HOLIDAY";
   createdAt: string;
   updatedAt: string;
+  category?: Category;
+  attachments?: Attachment[];
 }
 
-class DataStore {
-  public profile: UserProfileModel = {
-    id: "usr-me",
-    name: "Pengguna Log Book",
-    email: "saya@logbook.local",
-    jobTitle: "Software Developer / Profesional",
+export interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  jobTitle: string;
+  bio: string;
+  dailyTargetHours: number;
+}
+
+class InMemoryDataStore {
+  public categories: Category[] = [];
+  public logbooks: LogBook[] = [];
+  public attachments: Attachment[] = [];
+  public profile: Profile = {
+    id: "profile-1",
+    name: "Zuzule",
+    email: "zuzul@logbook.local",
+    jobTitle: "ccis",
+    bio: "bismillah",
     dailyTargetHours: 8,
-    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    bio: "Mencatat setiap progres dan milestone pekerjaan harian.",
   };
 
-  public categories: ActivityCategoryModel[] = [];
-  public logbooks: LogBookModel[] = [];
-  public attachments: LogBookAttachmentModel[] = [];
-  private initialized = false;
-
   constructor() {
-    this.initDefaultData();
+    this.seedInitialData();
   }
 
-  public async initDefaultData() {
-    if (this.initialized) return;
-    this.initialized = true;
-
-    // 1. Default Categories
+  private seedInitialData() {
+    // 1. Initial Categories
     this.categories = [
       {
         id: "cat-dev",
-        name: "Software Development & Coding",
-        description: "Pengembangan fitur, bugfixing, dan pembuatan kode program",
-        colorHex: "#3b82f6",
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: "cat-maintenance",
-        name: "Server & Database Maintenance",
-        description: "Pemeliharaan database, deployment, dan optimasi query",
-        colorHex: "#10b981",
+        name: "Pekerjaan",
+        description: "Mengerjakan tugas harian & jobdesk utama",
+        colorHex: "#f97316", // Flame Orange
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
         id: "cat-meeting",
-        name: "Meeting & Diskusi Teknis",
-        description: "Rapat koordinasi tim, sprint review, dan sesi sharing",
-        colorHex: "#f59e0b",
+        name: "Koordinasi & Technical Meeting",
+        description: "Rapat koordinasi tim, sprint planning, dan presentasi progres",
+        colorHex: "#f59e0b", // Radiant Amber
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
         id: "cat-learning",
-        name: "Riset & Self Learning",
-        description: "Eksplorasi teknologi baru, membaca dokumentasi, dan studi kasus",
-        colorHex: "#8b5cf6",
+        name: "Pembelajaran",
+        description: "Mempelajari framework, teknologi baru, dan eksplorasi riset",
+        colorHex: "#10b981", // Emerald
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "cat-other",
+        name: "Lainnya",
+        description: "Aktivitas administratif dan penunjang lainnya",
+        colorHex: "#8b5cf6", // Purple
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -109,9 +116,9 @@ class DataStore {
     ];
 
     // 2. Initial Sample Logbooks
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-    const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().slice(0, 10);
+    const today = toLocalDateString(new Date());
+    const yesterday = toLocalDateString(new Date(Date.now() - 86400000));
+    const twoDaysAgo = toLocalDateString(new Date(Date.now() - 172800000));
 
     this.logbooks = [
       {
@@ -165,8 +172,8 @@ class DataStore {
 
 // Global Singleton Store
 const globalStore = globalThis as unknown as {
-  dataStoreInstance: DataStore | undefined;
+  dataStoreInstance: InMemoryDataStore | undefined;
 };
 
-export const store = globalStore.dataStoreInstance ?? new DataStore();
+export const store = globalStore.dataStoreInstance ?? new InMemoryDataStore();
 if (process.env.NODE_ENV !== "production") globalStore.dataStoreInstance = store;

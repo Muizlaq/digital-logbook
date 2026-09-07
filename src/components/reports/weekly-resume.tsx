@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/badge";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatTime, toLocalDateString } from "@/lib/utils";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -43,13 +43,14 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
   // State: Selected reference date (defaults to today)
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Calculate Monday through Sunday for selected week
-  const { mondayDate, sundayDate, weekDates, weekLabel } = useMemo(() => {
+  // Calculate Monday through Sunday for selected week (Timezone-safe)
+  const { mondayDate, sundayDate, weekDates, weekLabel, mondayStr, sundayStr } = useMemo(() => {
     const d = new Date(selectedDate);
-    const day = d.getDay(); // 0 is Sunday, 1 is Monday
-    const diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+    const day = d.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+    const diffToMonday = day === 0 ? -6 : 1 - day;
 
-    const monday = new Date(d.setDate(diffToMonday));
+    const monday = new Date(d);
+    monday.setDate(d.getDate() + diffToMonday);
     monday.setHours(0, 0, 0, 0);
 
     const sunday = new Date(monday);
@@ -60,19 +61,21 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
     for (let i = 0; i < 7; i++) {
       const cur = new Date(monday);
       cur.setDate(monday.getDate() + i);
-      dates.push(cur.toISOString().slice(0, 10));
+      dates.push(toLocalDateString(cur));
     }
 
-    const mondayStr = monday.toISOString().slice(0, 10);
-    const sundayStr = sunday.toISOString().slice(0, 10);
+    const mStr = toLocalDateString(monday);
+    const sStr = toLocalDateString(sunday);
 
-    const weekLabelStr = `${formatDate(mondayStr)} - ${formatDate(sundayStr)}`;
+    const weekLabelStr = `${formatDate(mStr)} - ${formatDate(sStr)}`;
 
     return {
       mondayDate: monday,
       sundayDate: sunday,
       weekDates: dates,
       weekLabel: weekLabelStr,
+      mondayStr: mStr,
+      sundayStr: sStr,
     };
   }, [selectedDate]);
 
@@ -94,9 +97,6 @@ export function WeeklyResume({ logbooks = [], categories = [], profile }: Weekly
   };
 
   // Filter logbooks in this Monday - Sunday range
-  const mondayStr = mondayDate.toISOString().slice(0, 10);
-  const sundayStr = sundayDate.toISOString().slice(0, 10);
-
   const weekLogbooks = useMemo(() => {
     return logbooks.filter((lb) => lb.activityDate >= mondayStr && lb.activityDate <= sundayStr);
   }, [logbooks, mondayStr, sundayStr]);

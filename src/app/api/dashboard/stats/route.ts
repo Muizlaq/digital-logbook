@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { store } from "@/lib/services/data-store";
+import { toLocalDateString } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -24,7 +25,7 @@ export async function GET() {
     const totalHours = (totalMinutes / 60).toFixed(1);
 
     // Calculate TODAY's hours & target progress
-    const today = new Date().toISOString().slice(0, 10);
+    const today = toLocalDateString(new Date());
     const todayLogbooks = allLogbooks.filter((lb) => lb.activityDate === today);
     let todayMinutes = 0;
     todayLogbooks.forEach((lb) => {

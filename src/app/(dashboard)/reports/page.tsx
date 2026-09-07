@@ -85,19 +85,22 @@ export default function PersonalReportsPage() {
 
   const setPreset = (type: "today" | "thisWeek" | "thisMonth") => {
     const now = new Date();
-    const today = now.toISOString().slice(0, 10);
+    const today = toLocalDateString(now);
 
     if (type === "today") {
       setStartDate(today);
       setEndDate(today);
     } else if (type === "thisWeek") {
-      const firstDay = new Date(now.setDate(now.getDate() - now.getDay() + 1));
-      setStartDate(firstDay.toISOString().slice(0, 10));
-      setEndDate(new Date().toISOString().slice(0, 10));
+      const day = now.getDay();
+      const diffToMonday = day === 0 ? -6 : 1 - day;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() + diffToMonday);
+      setStartDate(toLocalDateString(monday));
+      setEndDate(toLocalDateString(new Date()));
     } else if (type === "thisMonth") {
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-      setStartDate(firstDay.toISOString().slice(0, 10));
-      setEndDate(new Date().toISOString().slice(0, 10));
+      setStartDate(toLocalDateString(firstDay));
+      setEndDate(toLocalDateString(new Date()));
     }
   };
 
