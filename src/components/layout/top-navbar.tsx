@@ -62,7 +62,7 @@ export function TopNavbar() {
           size="sm"
           className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-full text-xs shadow-lg shadow-orange-500/25 hover:scale-[1.03] transition-all cursor-pointer px-4"
         >
-          <Link href="/logbook/new">
+          <Link href="/logbook/new" prefetch={true}>
             <PlusCircle className="h-4 w-4 mr-1.5" /> Catat Aktivitas
           </Link>
         </Button>

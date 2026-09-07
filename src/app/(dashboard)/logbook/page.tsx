@@ -150,7 +150,7 @@ export default function PersonalLogbookListPage() {
 
       {/* RENDER CALENDAR VIEW */}
       {viewMode === "calendar" ? (
-        isLoading ? (
+        isLoading && !data ? (
           <Skeleton className="h-96 w-full rounded-3xl" />
         ) : (
           <CalendarView logbooks={items} categories={categories} />

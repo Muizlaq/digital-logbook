@@ -33,9 +33,9 @@ export default function DashboardPage() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 animate-pulse">
         <Skeleton className="h-44 w-full rounded-3xl" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
