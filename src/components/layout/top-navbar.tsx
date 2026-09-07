@@ -14,7 +14,7 @@ export function TopNavbar() {
   const { toggleSidebar, isCollapsed } = useSidebarStore();
 
   const getPageTitle = () => {
-    if (pathname.startsWith("/dashboard")) return "Dashboard Ringkasan";
+    if (pathname.startsWith("/dashboard")) return "Dashboard";
     if (pathname.startsWith("/logbook/new")) return "Catat Aktivitas Baru";
     if (pathname.includes("/edit")) return "Edit Log Book Aktivitas";
     if (pathname.startsWith("/logbook/")) return "Detail Aktivitas Log Book";
@@ -28,9 +28,8 @@ export function TopNavbar() {
 
   return (
     <header
-      className={`sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#090a0f]/80 px-4 sm:px-6 backdrop-blur-2xl transition-all duration-300 shadow-xs ${
-        isCollapsed ? "lg:pl-24" : "lg:pl-68"
-      }`}
+      className={`sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#090a0f]/80 px-4 sm:px-6 backdrop-blur-2xl transition-all duration-300 shadow-xs ${isCollapsed ? "lg:pl-24" : "lg:pl-68"
+        }`}
     >
       {/* Left: Mobile Toggle & Page Title */}
       <div className="flex items-center gap-3">

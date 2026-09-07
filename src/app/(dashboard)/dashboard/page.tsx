@@ -96,9 +96,9 @@ export default function DashboardPage() {
           {/* Headline (Fintech Typography) */}
           <div className="space-y-3">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.1]">
-              One Activity Layer. <br className="hidden sm:inline" />
+              Welcome to <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-white via-zinc-200 to-orange-400 bg-clip-text text-transparent">
-                Every Milestone.
+                Digital Log Book
               </span>
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 dark:text-zinc-400 font-normal leading-relaxed max-w-xl">
@@ -140,13 +140,12 @@ export default function DashboardPage() {
             {/* Circular Progress Ring */}
             <div className="relative flex items-center justify-center shrink-0">
               <div
-                className={`absolute w-24 h-24 rounded-full blur-xl transition-all duration-700 ${
-                  isGoalReached
+                className={`absolute w-24 h-24 rounded-full blur-xl transition-all duration-700 ${isGoalReached
                     ? "bg-emerald-500/25"
                     : todayProgress.hours > 0
-                    ? "bg-orange-500/30"
-                    : "bg-slate-300/30 dark:bg-zinc-700/20"
-                }`}
+                      ? "bg-orange-500/30"
+                      : "bg-slate-300/30 dark:bg-zinc-700/20"
+                  }`}
               />
 
               <svg className="w-32 h-32 transform -rotate-90">
@@ -162,9 +161,8 @@ export default function DashboardPage() {
                   cx="64"
                   cy="64"
                   r={radius}
-                  className={`transition-all duration-1000 ease-out ${
-                    isGoalReached ? "stroke-emerald-500" : "stroke-orange-500"
-                  }`}
+                  className={`transition-all duration-1000 ease-out ${isGoalReached ? "stroke-emerald-500" : "stroke-orange-500"
+                    }`}
                   strokeWidth="8"
                   strokeDasharray={circumference}
                   strokeDashoffset={strokeDashoffset}
@@ -196,8 +194,8 @@ export default function DashboardPage() {
                 {isGoalReached
                   ? "Luar biasa! Seluruh target jam kerja hari ini telah tuntas tercatat."
                   : todayProgress.hours > 0
-                  ? `Kurang ${todayProgress.remainingHours} jam lagi untuk menyelesaikan target harian.`
-                  : "Belum ada catatan aktivitas hari ini. Mulai catat pekerjaan Anda sekarang!"}
+                    ? `Kurang ${todayProgress.remainingHours} jam lagi untuk menyelesaikan target harian.`
+                    : "Belum ada catatan aktivitas hari ini. Mulai catat pekerjaan Anda sekarang!"}
               </p>
             </div>
           </div>

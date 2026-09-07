@@ -86,7 +86,7 @@ export function Sidebar() {
                   DIGITAL LOG BOOK
                 </span>
                 <span className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-widest">
-                  Fintech Edition
+                  MUIZLAQ
                 </span>
               </div>
             )}
