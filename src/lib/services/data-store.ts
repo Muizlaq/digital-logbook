@@ -1,3 +1,5 @@
+import { toLocalDateString } from "@/lib/utils";
+
 export interface UserProfileModel {
   id: string;
   name: string;
@@ -8,73 +10,69 @@ export interface UserProfileModel {
   bio?: string | null;
 }
 
-import { toLocalDateString } from "@/lib/utils";
-
-export interface Category {
+export interface ActivityCategoryModel {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   colorHex: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Attachment {
+export interface LogBookAttachmentModel {
   id: string;
   logBookId: string;
   fileName: string;
   filePath: string;
   fileSize: number;
-  mimeType: string;
+  fileType: string;
+  mimeType?: string;
   createdAt: string;
 }
 
-export interface LogBook {
+export interface LogBookModel {
   id: string;
-  categoryId: string;
-  activityDate: string;
-  startTime: string;
-  endTime: string;
+  categoryId?: string | null;
+  activityDate: string; // YYYY-MM-DD
+  startTime: string;    // HH:mm
+  endTime: string;      // HH:mm
   location: string;
   title: string;
   description: string;
   outputResult: string;
-  notes?: string;
-  status: "DRAFT" | "IN_PROGRESS" | "COMPLETED" | "SICK" | "PERMISSION" | "HOLIDAY";
+  notes?: string | null;
+  status: "COMPLETED" | "IN_PROGRESS" | "DRAFT" | "SICK" | "PERMISSION" | "HOLIDAY";
   createdAt: string;
   updatedAt: string;
-  category?: Category;
-  attachments?: Attachment[];
+  category?: ActivityCategoryModel;
+  attachments?: LogBookAttachmentModel[];
 }
 
-export interface Profile {
-  id: string;
-  name: string;
-  email: string;
-  jobTitle: string;
-  bio: string;
-  dailyTargetHours: number;
-}
-
-class InMemoryDataStore {
-  public categories: Category[] = [];
-  public logbooks: LogBook[] = [];
-  public attachments: Attachment[] = [];
-  public profile: Profile = {
-    id: "profile-1",
+export class DataStore {
+  public profile: UserProfileModel = {
+    id: "usr-me",
     name: "Zuzule",
     email: "zuzul@logbook.local",
     jobTitle: "ccis",
-    bio: "bismillah",
     dailyTargetHours: 8,
+    avatarUrl: null,
+    bio: "bismillah",
   };
 
+  public categories: ActivityCategoryModel[] = [];
+  public logbooks: LogBookModel[] = [];
+  public attachments: LogBookAttachmentModel[] = [];
+  private initialized = false;
+
   constructor() {
-    this.seedInitialData();
+    this.initDefaultData();
   }
 
-  private seedInitialData() {
+  public async initDefaultData() {
+    if (this.initialized) return;
+    this.initialized = true;
+
     // 1. Initial Categories
     this.categories = [
       {
@@ -138,7 +136,7 @@ class InMemoryDataStore {
       },
       {
         id: "lb-2",
-        categoryId: "cat-maintenance",
+        categoryId: "cat-dev",
         activityDate: yesterday,
         startTime: "13:00",
         endTime: "16:30",
@@ -172,8 +170,8 @@ class InMemoryDataStore {
 
 // Global Singleton Store
 const globalStore = globalThis as unknown as {
-  dataStoreInstance: InMemoryDataStore | undefined;
+  dataStoreInstance: DataStore | undefined;
 };
 
-export const store = globalStore.dataStoreInstance ?? new InMemoryDataStore();
+export const store = globalStore.dataStoreInstance ?? new DataStore();
 if (process.env.NODE_ENV !== "production") globalStore.dataStoreInstance = store;

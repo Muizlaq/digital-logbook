@@ -26,7 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ReportCharts } from "@/components/reports/report-charts";
 import { WeeklyResume } from "@/components/reports/weekly-resume";
-import { formatDate } from "@/lib/utils";
+import { formatDate, toLocalDateString } from "@/lib/utils";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
