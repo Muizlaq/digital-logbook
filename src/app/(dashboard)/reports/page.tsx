@@ -454,7 +454,7 @@ export default function PersonalReportsPage() {
           </div>
 
           {/* Dataset Table */}
-          {isLoading ? (
+          {isLoading && !data ? (
             <div className="space-y-2">
               {[1, 2, 3, 4].map((i) => (
                 <Skeleton key={i} className="h-14 w-full rounded-2xl" />

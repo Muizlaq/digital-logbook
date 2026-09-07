@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
-import { PreloadData } from "@/components/layout/preload-data";
 import { Toaster } from "sonner";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -12,10 +11,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 15, // 15 minutes fresh cache (Zero loading delay on tab switch)
-            gcTime: 1000 * 60 * 60, // Keep in garbage collection for 1 hour
+            staleTime: 1000 * 60 * 5, // 5 minutes cache validity
+            gcTime: 1000 * 60 * 30, // 30 minutes in memory
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: false, // Instant render without skeleton flicker
             refetchOnReconnect: false,
             retry: 1,
           },
@@ -26,7 +25,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
-        <PreloadData />
         {children}
         <Toaster position="top-right" richColors closeButton />
       </QueryClientProvider>

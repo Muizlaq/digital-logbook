@@ -76,7 +76,7 @@ export function Sidebar() {
       >
         {/* Brand Header */}
         <div className="flex h-16 items-center justify-between px-4 border-b border-slate-100 dark:border-white/[0.07]">
-          <Link href="/dashboard" prefetch={true} className="flex items-center gap-3 overflow-hidden group">
+          <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden group">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-orange-500 via-amber-500 to-rose-600 text-white shadow-lg shadow-orange-500/30 transition-transform group-hover:scale-105">
               <Flame className="h-5 w-5 animate-pulse" />
             </div>
